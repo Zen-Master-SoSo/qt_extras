@@ -1,0 +1,108 @@
+#  qt_extras/menu_button.py
+#
+#  Copyright 2024 liyang <liyang@veronica>
+#
+#  Pushbutton with an integrated drop-down menu
+
+import logging
+from PyQt5.QtCore import pyqtSignal, pyqtSlot, QPoint, QVariant
+from PyQt5.QtWidgets import QMenu, QPushButton
+
+
+class QtMenuButton(QPushButton):
+
+	sig_itemSelected = pyqtSignal(str, QVariant)
+
+	def __init__(self, parent, fill_callback=None):
+		"""
+		fill_callback should return a list of tuples,
+		containing text and data. It will be called when
+		the menu button is clicked.
+		Skips if fill_callback is None:
+		"""
+		super().__init__(parent)
+		self.fill_callback = fill_callback
+		self.menu = QMenu(self)
+		self.setObjectName('menu_btn')
+		self.menu.setObjectName('pb_menu')
+		self.clicked.connect(self.click_event)
+		self.__current_data = None
+
+	def clear(self):
+		self.menu.clear()
+
+	def addItem(self, item_text, item_data):
+		action = self.menu.addAction(item_text)
+		action.setData(item_data)
+
+	def addItems(self, items):
+		"""
+		items must be a list of tuples containing (text, data)
+		"""
+		for item in items:
+			action = self.menu.addAction(item[0])
+			action.setData(item[1])
+
+	def __iter__(self):
+		"""
+		Generator returns tuples of (text, data) for each menu item.
+		"""
+		for action in self.menu.actions():
+			yield (action.text(), action.data())
+
+	def __len__(self):
+		return len(self.menu.actions())
+
+	def setFont(self, font):
+		super().setFont(font)
+		self.menu.setFont(self.font())
+
+	def setPointSize(self, size):
+		font = self.font()
+		font.setPointSize(size)
+		self.setFont(font)
+
+	@pyqtSlot()
+	def click_event(self):
+		if self.fill_callback is not None:
+			self.menu.clear()
+			for tup in self.fill_callback():
+				self.addItem(*tup)
+		point = self.mapToGlobal(QPoint(0, self.height()))
+		self.menu.setFixedWidth(self.width())
+		action = self.menu.exec(point)
+		if not action is None:
+			self.setText(action.text())
+			self.__current_data = action.data()
+			self.sig_itemSelected.emit(action.text(), action.data())
+
+	def data(self):
+		return self.__current_data
+
+	def data_label(self, data):
+		for action in self.menu.actions():
+			if action.data() is data:
+				return action.text()
+
+	def select_text(self, text):
+		if text != self.text():
+			for action in self.menu.actions():
+				if action.text() == text:
+					self.setText(text)
+					self.__current_data = action.data()
+					self.sig_itemSelected.emit(action.text(), action.data())
+					return
+			raise IndexError
+
+	def select_data(self, data):
+		if data != self.__current_data:
+			for action in self.menu.actions():
+				if action.data() is data:
+					self.setText(action.text())
+					self.__current_data = data
+					self.sig_itemSelected.emit(action.text(), action.data())
+					return
+			raise IndexError
+
+
+# end qt_extras/menu_button.py
