@@ -48,4 +48,28 @@ class ShutUpQT(object):
 		self.root.setLevel(self.previous_log_level)	# Carry on ...
 
 
+class WidgetDisabler:
+	"""
+	A context manager that disables every widget in a window.
+
+		with WidgetDisabler(window):
+			...do something
+
+	"""
+
+	def __init__(self, window):
+		self.window = window
+
+	def __enter__(self):
+		for widget in self.window.findChildren(QWidget):
+			if hasattr(widget, 'isEnabled') and hasattr(widget, 'setEnabled'):
+				widget.qt_extra_previous_enabled_state = widget.isEnabled()
+				widget.setEnabled(False)
+
+	def __exit__(self, *_):
+		for widget in self.window.findChildren(QWidget):
+			if hasattr(widget, 'qt_extra_previous_enabled_state'):
+				widget.setEnabled(widget.qt_extra_previous_enabled_state)
+
+
 # end qt_extras/__init__.py
