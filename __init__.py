@@ -2,9 +2,8 @@
 #
 #  Copyright 2024 liyang <liyang@veronica>
 #
-
-import os, sys, logging
-sys.path.append(os.path.dirname(os.path.realpath(__file__)))
+import logging
+from PyQt5.QtWidgets import QMessageBox
 
 
 class SigBlock:
@@ -70,6 +69,28 @@ class WidgetDisabler:
 		for widget in self.window.findChildren(QWidget):
 			if hasattr(widget, 'qt_extra_previous_enabled_state'):
 				widget.setEnabled(widget.qt_extra_previous_enabled_state)
+
+
+class DevilBox(QMessageBox):
+	"""
+	A MessageBox for when bad stuff happens.
+	"""
+	def __init__(self, message):
+		super().__init__()
+		self.setWindowTitle('Something bad happened')
+		self.setIcon(QMessageBox.Critical)
+		if isinstance(message, Exception):
+			tb = message.__traceback__
+			self.setText('%s: %s in %s %s, line %d' % (
+				type(message).__name__,
+				str(message),
+				tb.tb_frame.f_code.co_filename,
+				tb.tb_frame.f_code.co_name,
+				tb.tb_lineno
+			))
+		else:
+			self.setText(str(message))
+		self.exec_();
 
 
 # end qt_extras/__init__.py
