@@ -44,7 +44,7 @@ class ListLayout(QBoxLayout):
 
 	def insert(self, index, item):
 		if index < 0:
-			raise ValueError
+			raise ValueError("Index must be >= 0")
 		if index < len(self.items):
 			layout_index = self.indexOf(self.items[index])
 			self.items.insert(index, item)

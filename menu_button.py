@@ -92,7 +92,7 @@ class QtMenuButton(QPushButton):
 					self.__current_data = action.data()
 					self.sig_itemSelected.emit(action.text(), action.data())
 					return
-			raise IndexError
+			raise IndexError()
 
 	def select_data(self, data):
 		if data != self.__current_data:
@@ -102,7 +102,7 @@ class QtMenuButton(QPushButton):
 					self.__current_data = data
 					self.sig_itemSelected.emit(action.text(), action.data())
 					return
-			raise IndexError
+			raise IndexError()
 
 
 # end qt_extras/menu_button.py
