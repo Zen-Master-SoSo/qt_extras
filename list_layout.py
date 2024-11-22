@@ -13,12 +13,16 @@ class ListLayout(QBoxLayout):
 	Exposes the widgets in a layout as a list, ignoring spacers.
 	"""
 
-	def __init__(self, end_stretch=None):
+	def __init__(self, end_space=None):
+		"""
+		end_space (int) is optional spacing with the given minimal size
+		to append to the end of the list.
+		"""
 		super().__init__(QBoxLayout.LeftToRight if isinstance(self, QHBoxLayout) else QBoxLayout.TopToBottom)
 		self.items = []
-		self.end_stretch = end_stretch
-		if self.end_stretch is not None:
-			self.addStretch(self.end_stretch)
+		self.end_space = end_space
+		if self.end_space is not None:
+			self.addStretch(self.end_space)
 
 	def __iter__(self):
 		return self.items.__iter__()
@@ -37,7 +41,7 @@ class ListLayout(QBoxLayout):
 
 	def append(self, item):
 		self.items.append(item)
-		if self.end_stretch is None:
+		if self.end_space is None:
 			self.addWidget(item)
 		else:
 			self.insertWidget(super().count() - 1, item)
