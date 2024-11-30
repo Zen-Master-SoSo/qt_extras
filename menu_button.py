@@ -2,7 +2,9 @@
 #
 #  Copyright 2024 liyang <liyang@veronica>
 #
-#  Pushbutton with an integrated drop-down menu
+"""
+Pushbutton with an integrated drop-down menu.
+"""
 
 import logging
 from PyQt5.QtCore import pyqtSignal, pyqtSlot, QPoint, QVariant
@@ -105,4 +107,4 @@ class QtMenuButton(QPushButton):
 			raise IndexError()
 
 
-# end qt_extras/menu_button.py
+#  end qt_extras/menu_button.py

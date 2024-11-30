@@ -1,3 +1,7 @@
+#  qt_extras/tests/autofit.py
+#
+#  Copyright 2024 liyang <liyang@veronica>
+#
 import qt_extras.autofit
 from PyQt5.QtWidgets import QWidget, QMainWindow, QApplication, QShortcut, QPushButton, QLineEdit, QVBoxLayout, QSizePolicy
 from PyQt5.QtGui import QKeySequence
@@ -34,3 +38,5 @@ if __name__ == "__main__":
 	window.show()
 	app.exec()
 
+
+#  end qt_extras/tests/autofit.py

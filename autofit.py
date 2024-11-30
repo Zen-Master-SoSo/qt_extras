@@ -2,7 +2,6 @@
 #
 #  Copyright 2024 liyang <liyang@veronica>
 #
-
 """
 Override's widget's setText() function.
 Stores original text as "_unabbreviated_text", abbreviates it,

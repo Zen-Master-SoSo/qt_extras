@@ -2,9 +2,9 @@
 #
 #  Copyright 2024 liyang <liyang@veronica>
 #
-# qt_extras.list_layout
-# "Collection" layouts which act like lists:
-#
+"""
+"Collection" layouts which act like lists:
+"""
 from PyQt5.QtWidgets import QBoxLayout, QHBoxLayout, QVBoxLayout
 
 
@@ -84,4 +84,4 @@ class VListLayout(ListLayout, QVBoxLayout):
 	pass
 
 
-# end qt_extras/list_layout.py
+#  end qt_extras/list_layout.py

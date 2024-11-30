@@ -93,4 +93,4 @@ class DevilBox(QMessageBox):
 		self.exec_();
 
 
-# end qt_extras/__init__.py
+#  end qt_extras/__init__.py

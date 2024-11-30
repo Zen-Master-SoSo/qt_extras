@@ -1,3 +1,7 @@
+#  qt_extras/tests/menu_button.py
+#
+#  Copyright 2024 liyang <liyang@veronica>
+#
 from PyQt5.QtCore import pyqtSignal, pyqtSlot, QVariant
 from PyQt5.QtWidgets import QMainWindow, QPushButton
 from qt_extras.menu_button import QtMenuButton
@@ -59,3 +63,4 @@ if __name__ == "__main__":
 	window.show()
 	app.exec()
 
+#  end qt_extras/tests/menu_button.py
