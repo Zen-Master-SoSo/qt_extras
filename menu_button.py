@@ -13,7 +13,7 @@ from PyQt5.QtWidgets import QMenu, QPushButton
 
 class QtMenuButton(QPushButton):
 
-	sig_itemSelected = pyqtSignal(str, QVariant)
+	sig_item_selected = pyqtSignal(str, QVariant)
 
 	def __init__(self, parent, fill_callback=None):
 		"""
@@ -76,7 +76,7 @@ class QtMenuButton(QPushButton):
 		if not action is None:
 			self.setText(action.text())
 			self.__current_data = action.data()
-			self.sig_itemSelected.emit(action.text(), action.data())
+			self.sig_item_selected.emit(action.text(), action.data())
 
 	def data(self):
 		return self.__current_data
@@ -92,7 +92,7 @@ class QtMenuButton(QPushButton):
 				if action.text() == text:
 					self.setText(text)
 					self.__current_data = action.data()
-					self.sig_itemSelected.emit(action.text(), action.data())
+					self.sig_item_selected.emit(action.text(), action.data())
 					return
 			raise IndexError()
 
@@ -102,7 +102,7 @@ class QtMenuButton(QPushButton):
 				if action.data() is data:
 					self.setText(action.text())
 					self.__current_data = data
-					self.sig_itemSelected.emit(action.text(), action.data())
+					self.sig_item_selected.emit(action.text(), action.data())
 					return
 			raise IndexError()
 

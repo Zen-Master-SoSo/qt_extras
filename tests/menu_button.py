@@ -28,7 +28,7 @@ class MainWindow(QMainWindow):
 		self.menu_button.setText('Click for menu')
 		self.menu_button.addItem("item 1", self.label_1)
 		self.menu_button.addItem("item 2", self.label_2)
-		self.menu_button.sig_itemSelected.connect(self.item_selected)
+		self.menu_button.sig_item_selected.connect(self.item_selected)
 
 		select_data_value_button = QPushButton('Set menu to label 1', self)
 		select_data_value_button.clicked.connect(self.select_data_value_button_click)
