@@ -30,10 +30,10 @@ class MainWindow(QMainWindow):
 		self.menu_button.addItem("item 2", self.label_2)
 		self.menu_button.sig_item_selected.connect(self.item_selected)
 
-		select_data_value_button = QPushButton('Set menu to label 1', self)
+		select_data_value_button = QPushButton('Test select_data (Choose <label_1>)', self)
 		select_data_value_button.clicked.connect(self.select_data_value_button_click)
 
-		set_text_button = QPushButton('Select "item 2" programmatically', self)
+		set_text_button = QPushButton('Test select_text (Choose "item 2")', self)
 		set_text_button.clicked.connect(self.set_text_button_click)
 
 		lo.addWidget(self.label_1)

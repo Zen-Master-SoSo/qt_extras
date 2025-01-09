@@ -5,8 +5,6 @@
 """
 Pushbutton with an integrated drop-down menu.
 """
-
-import logging
 from PyQt5.QtCore import pyqtSignal, pyqtSlot, QPoint, QVariant
 from PyQt5.QtWidgets import QMenu, QPushButton
 
@@ -66,10 +64,7 @@ class QtMenuButton(QPushButton):
 
 	@pyqtSlot()
 	def click_event(self):
-		if self.fill_callback is not None:
-			self.menu.clear()
-			for tup in self.fill_callback():
-				self.addItem(*tup)
+		self._do_fill()
 		point = self.mapToGlobal(QPoint(0, self.height()))
 		self.menu.setFixedWidth(self.width())
 		action = self.menu.exec(point)
@@ -87,6 +82,7 @@ class QtMenuButton(QPushButton):
 				return action.text()
 
 	def select_text(self, text):
+		self._do_fill()
 		if text != self.text():
 			for action in self.menu.actions():
 				if action.text() == text:
@@ -97,6 +93,7 @@ class QtMenuButton(QPushButton):
 			raise IndexError()
 
 	def select_data(self, data):
+		self._do_fill()
 		if data != self.__current_data:
 			for action in self.menu.actions():
 				if action.data() is data:
@@ -106,5 +103,10 @@ class QtMenuButton(QPushButton):
 					return
 			raise IndexError()
 
+	def _do_fill(self):
+		if self.fill_callback is not None:
+			self.menu.clear()
+			for tup in self.fill_callback():
+				self.addItem(*tup)
 
 #  end qt_extras/menu_button.py
