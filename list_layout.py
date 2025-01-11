@@ -73,6 +73,12 @@ class ListLayout(QBoxLayout):
 		self.removeWidget(item)
 		item.deleteLater()
 
+	def clear(self):
+		for item in self.items:
+			self.removeWidget(item)
+			item.deleteLater()
+		self.items = []
+
 
 class HListLayout(ListLayout, QHBoxLayout):
 
