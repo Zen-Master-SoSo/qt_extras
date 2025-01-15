@@ -13,7 +13,7 @@ class QtMenuButton(QPushButton):
 
 	sig_item_selected = pyqtSignal(str, QVariant)
 
-	def __init__(self, parent, fill_callback=None):
+	def __init__(self, parent, fill_callback=None, constrain_width = False):
 		"""
 		fill_callback should return a list of tuples,
 		containing text and data. It will be called when
@@ -22,6 +22,7 @@ class QtMenuButton(QPushButton):
 		"""
 		super().__init__(parent)
 		self.fill_callback = fill_callback
+		self.constrain_width = constrain_width
 		self.menu = QMenu(self)
 		self.setObjectName('menu_btn')
 		self.menu.setObjectName('pb_menu')
@@ -66,7 +67,10 @@ class QtMenuButton(QPushButton):
 	def click_event(self):
 		self._do_fill()
 		point = self.mapToGlobal(QPoint(0, self.height()))
-		self.menu.setFixedWidth(self.width())
+		if self.constrain_width:
+			self.menu.setFixedWidth(self.width())
+		else:
+			self.menu.setMinimumWidth(self.width())
 		action = self.menu.exec(point)
 		if not action is None:
 			self.setText(action.text())
