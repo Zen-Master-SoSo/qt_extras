@@ -32,7 +32,7 @@ class _ListLayout(QLayout):
 		if self.end_space is None:
 			self.addWidget(item)
 		else:
-			self.insertWidget(len(self.items) - 1, item)
+			self.insertWidget(len(self.items), item)
 		self.items.append(item)
 
 	def insert(self, index, item):
