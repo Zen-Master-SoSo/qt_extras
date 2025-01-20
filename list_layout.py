@@ -32,7 +32,7 @@ class _ListLayout(QLayout):
 		if self.end_space is None:
 			self.addWidget(item)
 		else:
-			self.insertWidget(len(self.items), item)
+			self.insertWidget(len(self.items) - 1, item)
 		self.items.append(item)
 
 	def insert(self, index, item):
@@ -100,7 +100,7 @@ class GListLayout(QGridLayout, _ListLayout):
 	HORIZONTAL_FLOW = 0
 	VERTICAL_FLOW = 1
 
-	def __init__(self, columns_or_rows = 1, flow = 0):
+	def __init__(self, columns_or_rows, flow = 0):
 		super().__init__()
 		self.items = []
 		self.columns_or_rows = columns_or_rows
