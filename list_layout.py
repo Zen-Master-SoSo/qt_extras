@@ -66,9 +66,9 @@ class _ListLayout(QLayout):
 
 class _ListBoxLayout(QBoxLayout, _ListLayout):
 
-	def __init__(self, end_space=None):
+	def __init__(self, end_space = None):
 		"""
-		"end_space" is optional spacing with the given minimal size (int)
+		"end_space" is optional spacing with the given stretch factor
 		to append to the end of the list.
 		"""
 		super().__init__()
