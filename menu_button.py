@@ -69,6 +69,8 @@ class QtMenuButton(QPushButton):
 		point = self.mapToGlobal(QPoint(0, self.height()))
 		if self.constrain_width:
 			self.menu.setFixedWidth(self.width())
+		else:
+			self.menu.setMinimumWidth(self.width())
 		action = self.menu.exec(point)
 		if not action is None:
 			self.setText(action.text())
