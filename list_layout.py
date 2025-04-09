@@ -108,6 +108,11 @@ class GListLayout(_ListLayout, QGridLayout):
 	VERTICAL_FLOW = 1
 
 	def __init__(self, columns_or_rows, flow = 0):
+		"""
+		The meaning of columns_or_rows depends on "flow".
+		If the flow is horizontal, items are added left to right, then top to bottom.
+		If the flow is vertical, items are added top to bottom, then left to right.
+		"""
 		super().__init__()
 		self.items = []
 		self.columns_or_rows = columns_or_rows
