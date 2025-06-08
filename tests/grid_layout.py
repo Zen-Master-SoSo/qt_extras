@@ -6,7 +6,7 @@ import logging
 from PyQt5.QtCore import pyqtSignal, pyqtSlot
 from PyQt5.QtWidgets import QMainWindow, QWidget, QPushButton, QSpinBox, QLabel
 from PyQt5.QtWidgets import QHBoxLayout, QVBoxLayout, QFrame
-from qt_extras.list_layout import GListLayout
+from qt_extras.list_layout import GListLayout, HORIZONTAL_FLOW
 
 
 class MainWindow(QMainWindow):
@@ -46,7 +46,7 @@ class MainWindow(QMainWindow):
 		lo.addWidget(button)
 
 		frm = QFrame(self)
-		self.list = GListLayout(1, GListLayout.HORIZONTAL_FLOW)
+		self.list = GListLayout(1, HORIZONTAL_FLOW)
 		frm.setLayout(self.list)
 		lo.addWidget(frm)
 

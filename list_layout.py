@@ -8,6 +8,9 @@
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QLayout, QBoxLayout, QHBoxLayout, QVBoxLayout, QGridLayout, QWidget
 
+HORIZONTAL_FLOW = 0
+VERTICAL_FLOW = 1
+
 
 class _ListLayout:
 	"""
@@ -104,10 +107,7 @@ class GListLayout(_ListLayout, QGridLayout):
 	Change this using one of the direction constants.
 	"""
 
-	HORIZONTAL_FLOW = 0
-	VERTICAL_FLOW = 1
-
-	def __init__(self, columns_or_rows, flow = 0):
+	def __init__(self, columns_or_rows, flow = HORIZONTAL_FLOW):
 		"""
 		The meaning of columns_or_rows depends on "flow".
 		If the flow is horizontal, items are added left to right, then top to bottom.
@@ -148,18 +148,18 @@ class GListLayout(_ListLayout, QGridLayout):
 		self.sig_size_changed.emit()
 
 	def set_columns(self, columns):
-		if columns != self.columns_or_rows or self.flow != GListLayout.HORIZONTAL_FLOW:
+		if columns != self.columns_or_rows or self.flow != HORIZONTAL_FLOW:
 			self._take_all_from(0)
 			self.columns_or_rows = columns
-			self.flow = GListLayout.HORIZONTAL_FLOW
+			self.flow = HORIZONTAL_FLOW
 			self._add_all_from(0)
 			self.sig_size_changed.emit()
 
 	def set_rows(self, rows):
-		if rows != self.columns_or_rows or self.flow != GListLayout.VERTICAL_FLOW:
+		if rows != self.columns_or_rows or self.flow != VERTICAL_FLOW:
 			self._take_all_from(0)
 			self.columns_or_rows = rows
-			self.flow = GListLayout.VERTICAL_FLOW
+			self.flow = VERTICAL_FLOW
 			self._add_all_from(0)
 			self.sig_size_changed.emit()
 
@@ -167,7 +167,7 @@ class GListLayout(_ListLayout, QGridLayout):
 		"""
 		Puts the given widget in the correct cell for the given index
 		"""
-		if self.flow == GListLayout.HORIZONTAL_FLOW:
+		if self.flow == HORIZONTAL_FLOW:
 			row = index // self.columns_or_rows
 			column = index - row * self.columns_or_rows
 		else:
