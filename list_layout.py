@@ -39,8 +39,8 @@ class _ListLayout:
 			self.addWidget(item)
 		else:
 			self.insertWidget(len(self.items), item)
-		self.sig_size_changed.emit()
 		self.items.append(item)
+		self.sig_size_changed.emit()
 
 	def insert(self, index, item):
 		if not (0 <= index <= len(self.items)):
