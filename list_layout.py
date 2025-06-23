@@ -60,6 +60,36 @@ class _ListLayout:
 		item.deleteLater()
 		self.sig_size_changed.emit()
 
+	def swap(self, item_a, item_b):
+		if not item_a in self.items or not item_b in self.items:
+			raise ValueError("Item not in list layout")
+		index_a = self.items.index(item_a)
+		index_b = self.items.index(item_b)
+		if index_a < index_b:
+			self.replaceWidget(item_a, item_b)
+			self.insertWidget(index_b, item_a)
+		else:
+			self.replaceWidget(item_b, item_a)
+			self.insertWidget(index_a, item_b)
+		self.items[index_a] = item_b
+		self.items[index_b] = item_a
+
+	def move_up(self, item):
+		if item not in self.items:
+			raise ValueError("Item not in list layout")
+		index = self.items.index(item)
+		if index == 0:
+			raise ValueError("Item is first in layout")
+		self.swap(item, self.items[index - 1])
+
+	def move_down(self, item):
+		if item not in self.items:
+			raise ValueError("Item not in list layout")
+		index = self.items.index(item)
+		if index == len(self.items) - 1:
+			raise ValueError("Item is last in layout")
+		self.swap(item, self.items[index + 1])
+
 	def clear(self):
 		for iter_index in reversed(range(len(self.items))):
 			item = self.takeAt(iter_index)
