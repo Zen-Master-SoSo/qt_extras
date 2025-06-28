@@ -62,7 +62,7 @@ class MainWindow(QMainWindow):
 
 		frm = QFrame(self)
 		self.list = VListLayout()
-		self.list.sig_size_changed.connect(self.slot_len_changed)
+		self.list.sig_len_changed.connect(self.slot_len_changed)
 		frm.setLayout(self.list)
 		main_layout.addWidget(frm)
 
