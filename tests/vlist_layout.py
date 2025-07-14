@@ -149,8 +149,8 @@ class Thing(QWidget):
 
 if __name__ == "__main__":
 	logging.basicConfig(
-		level=logging.DEBUG,
-		format='[%(filename)24s:%(lineno)3d] %(message)s'
+		level = logging.DEBUG,
+		format = "[%(filename)24s:%(lineno)-4d] %(message)s"
 	)
 	app = QApplication([])
 	window = MainWindow()

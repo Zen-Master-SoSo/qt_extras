@@ -97,8 +97,8 @@ if __name__ == "__main__":
 	from PyQt5.QtGui import QKeySequence
 	from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QShortcut, QVBoxLayout
 	logging.basicConfig(
-		level=logging.DEBUG,
-		format='[%(filename)24s:%(lineno)3d] %(message)s'
+		level = logging.DEBUG,
+		format = "[%(filename)24s:%(lineno)-4d] %(message)s"
 	)
 	app = QApplication([])
 	window = MainWindow()
