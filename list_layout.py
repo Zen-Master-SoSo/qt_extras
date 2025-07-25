@@ -31,6 +31,9 @@ class _ListLayout:
 	def __len__(self):
 		return len(self.items)
 
+	def __bool__(self):
+		return bool(self.items)
+
 	def __getitem__(self, idx):
 		return self.items[idx]
 
