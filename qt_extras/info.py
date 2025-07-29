@@ -23,7 +23,7 @@ Provides a command-line tool which accepts a PyQT class name and provides:
 -- or --
 2. An import statement
 """
-import importlib, argparse
+import sys, argparse, importlib
 
 def print_members_of(class_name):
 	for qtmodule in ['PyQt5', 'PyQt5.QtCore', 'PyQt5.QtGui', 'PyQt5.QtWidgets']:
@@ -35,7 +35,8 @@ def print_members_of(class_name):
 						print(member)
 				return
 
-if __name__ == "__main__":
+def main():
+
 	parser = argparse.ArgumentParser()
 	parser.epilog = """
 	Routines to show info from Qt classes.
@@ -51,7 +52,6 @@ if __name__ == "__main__":
 			for qtclass in dir(module):
 				if qtclass[0] != '_':
 					imports[ str(qtclass).lower() ] = f'from {module.__name__} import {qtclass}'
-
 	for class_name in options.ClassName:
 		class_name = class_name.lower()
 		if options.import_statement:
@@ -59,6 +59,9 @@ if __name__ == "__main__":
 				print(imports[class_name])
 		else:
 			print_members_of(class_name)
+	return 0
 
+if __name__ == "__main__":
+	sys.exit(main())
 
 #  end qt_extras/qt_extras/info.py

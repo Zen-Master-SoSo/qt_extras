@@ -3,7 +3,7 @@ requires = ["flit_core >=3.2,<4"]
 build-backend = "flit_core.buildapi"
 
 [project]
-name = "qt_extras"
+name = "soso_qt_extras"
 authors = [{name = "Leon Dionne", email = "ldionne@dridesign.sh.cn"}]
 readme = "README.md"
 license = {file = "LICENSE"}
@@ -13,8 +13,14 @@ dependencies = [
 	"PyQt5"
 ]
 
+[project.scripts]
+qtinfo = "qt_extras.info:main"
+
 [project.urls]
 Home = "https://github.com/Zen-Master-SoSo/qt_extras"
+
+[tool.flit.module]
+name = "qt_extras"
 
 [bumpver]
 current_version = "1.0.0"

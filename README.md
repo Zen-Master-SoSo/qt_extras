@@ -1,6 +1,6 @@
 # qt_extras
 
-Provides various extras for PyQt.
+Provides various extras for PyQt, including menu_button, list_layouts, autofit, SigBlock, ShutUpQT, WidgetDisabler and DevilBox
 
 ## Classes:
 
