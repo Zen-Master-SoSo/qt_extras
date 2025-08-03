@@ -30,7 +30,7 @@ Quick and dirty error message dialog.
 
 Pushbutton with an integrated pop-aside menu.
 
-### menu_button:
+### list_button:
 
 Pushbutton with an integrated drop-down list containing text and data.
 
