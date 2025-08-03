@@ -4,7 +4,7 @@
 #
 from PyQt5.QtCore import pyqtSignal, pyqtSlot, QVariant
 from PyQt5.QtWidgets import QMainWindow, QPushButton
-from qt_extras.menu_button import QtMenuButton
+from qt_extras.menu_button import QtListButton
 
 
 class MainWindow(QMainWindow):
@@ -19,7 +19,7 @@ class MainWindow(QMainWindow):
 		lo = QVBoxLayout()
 		wid.setLayout(lo)
 
-		self.menu_button = QtMenuButton(self)
+		self.menu_button = QtListButton(self)
 		font = self.menu_button.font()
 		self.menu_button.setPointSize(10)
 		self.label_1 = QLabel('THIS IS LABEL 1', self)

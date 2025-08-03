@@ -1,4 +1,4 @@
-#  qt_extras/qt_extras/menu_button.py
+#  qt_extras/menu_button.py
 #
 #  Copyright 2025 Leon Dionne <ldionne@dridesign.sh.cn>
 #
@@ -19,6 +19,34 @@
 #
 """
 Pushbutton with an integrated drop-down menu.
+
+For convenience, the "Action" -related attributes of the pushbutton are
+delegated to the integrated menu. These include:
+
+	actions
+	addAction
+	addActions
+	insertAction
+	insertActions
+	removeAction
+	clear
+
+
+Typical use (in a dialog created by QtDesigner):
+
+	menu_button = QtMenuButton(self)
+	self.layout().replaceWidget(self.b_menu, menu_button)
+	self.b_menu.deleteLater()
+	self.b_menu = menu_button
+
+	action = QAction('Do the first thing', self.b_menu)
+	action.triggered.connect(self.slot_first_thing)
+	self.b_menu.addAction(action)
+
+	action = QAction('Do the second thing', self.b_menu)
+	action.triggered.connect(self.slot_second_thing)
+	self.b_menu.addAction(action)
+
 """
 from PyQt5.QtCore import pyqtSignal, pyqtSlot, QPoint, QVariant
 from PyQt5.QtWidgets import QMenu, QPushButton
@@ -26,48 +54,41 @@ from PyQt5.QtWidgets import QMenu, QPushButton
 
 class QtMenuButton(QPushButton):
 
-	sig_item_selected = pyqtSignal(str, QVariant)
-
-	def __init__(self, parent, fill_callback=None, constrain_width = False):
+	def __init__(self, parent, fill_callback = None, constrain_width = False):
 		"""
-		fill_callback should return a list of tuples,
-		containing text and data. It will be called when
-		the menu button is clicked.
-		Skips if fill_callback is None:
+		fill_callback is called when the menu button is clicked, to allow you to fill
+		the menu before it is shown.
+
+		If constrain_width is set, the width of the menu will be constrained to the
+		width of the pushbutton which triggers it.
 		"""
 		super().__init__(parent)
 		self.fill_callback = fill_callback
 		self.constrain_width = constrain_width
 		self.menu = QMenu(self)
-		self.setObjectName('menu_btn')
-		self.menu.setObjectName('pb_menu')
+		self.setObjectName('qt_menu_button')
+		self.menu.setObjectName('qt_menu_button_menu')
+
+		self.actions = self.menu.actions
+		self.addAction = self.menu.addAction
+		self.addActions = self.menu.addActions
+		self.insertAction = self.menu.insertAction
+		self.insertActions = self.menu.insertActions
+		self.removeAction = self.menu.removeAction
+		self.clear = self.menu.clear
+
 		self.clicked.connect(self.click_event)
-		self.__current_data = None
 
-	def clear(self):
-		self.menu.clear()
-
-	def addItem(self, item_text, item_data):
-		action = self.menu.addAction(item_text)
-		action.setData(item_data)
-
-	def addItems(self, items):
-		"""
-		items must be a list of tuples containing (text, data)
-		"""
-		for item in items:
-			action = self.menu.addAction(item[0])
-			action.setData(item[1])
-
-	def __iter__(self):
-		"""
-		Generator returns tuples of (text, data) for each menu item.
-		"""
-		for action in self.menu.actions():
-			yield (action.text(), action.data())
-
-	def __len__(self):
-		return len(self.menu.actions())
+	@pyqtSlot()
+	def click_event(self):
+		if self.fill_callback is not None:
+			self.fill_callback()
+		point = self.mapToGlobal(QPoint(0, self.height()))
+		if self.constrain_width:
+			self.menu.setFixedWidth(self.width())
+		else:
+			self.menu.setMinimumWidth(self.width())
+		self.menu.exec(point)
 
 	def setFont(self, font):
 		super().setFont(font)
@@ -78,54 +99,5 @@ class QtMenuButton(QPushButton):
 		font.setPointSize(size)
 		self.setFont(font)
 
-	@pyqtSlot()
-	def click_event(self):
-		self._do_fill()
-		point = self.mapToGlobal(QPoint(0, self.height()))
-		if self.constrain_width:
-			self.menu.setFixedWidth(self.width())
-		else:
-			self.menu.setMinimumWidth(self.width())
-		action = self.menu.exec(point)
-		if not action is None:
-			self.setText(action.text())
-			self.__current_data = action.data()
-			self.sig_item_selected.emit(action.text(), action.data())
 
-	def data(self):
-		return self.__current_data
-
-	def data_label(self, data):
-		for action in self.menu.actions():
-			if action.data() is data:
-				return action.text()
-
-	def select_text(self, text):
-		self._do_fill()
-		if text != self.text():
-			for action in self.menu.actions():
-				if action.text() == text:
-					self.setText(text)
-					self.__current_data = action.data()
-					self.sig_item_selected.emit(action.text(), action.data())
-					return
-			raise IndexError()
-
-	def select_data(self, data):
-		self._do_fill()
-		if data != self.__current_data:
-			for action in self.menu.actions():
-				if action.data() is data:
-					self.setText(action.text())
-					self.__current_data = data
-					self.sig_item_selected.emit(action.text(), action.data())
-					return
-			raise IndexError()
-
-	def _do_fill(self):
-		if self.fill_callback is not None:
-			self.menu.clear()
-			for tup in self.fill_callback():
-				self.addItem(*tup)
-
-#  end qt_extras/qt_extras/menu_button.py
+#  end qt_extras/menu_button.py
