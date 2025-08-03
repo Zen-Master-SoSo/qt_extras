@@ -23,7 +23,7 @@ Home = "https://github.com/Zen-Master-SoSo/qt_extras"
 name = "qt_extras"
 
 [bumpver]
-current_version = "1.1.1"
+current_version = "1.1.2"
 version_pattern = "MAJOR.MINOR.PATCH"
 commit_message = "Bump version {old_version} -> {new_version}"
 commit = true
