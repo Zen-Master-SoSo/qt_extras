@@ -4,7 +4,7 @@
 #
 from PyQt5.QtCore import pyqtSignal, pyqtSlot, QVariant
 from PyQt5.QtWidgets import QMainWindow, QPushButton
-from qt_extras.menu_button import QtListButton
+from qt_extras.list_button import QtListButton
 
 
 class MainWindow(QMainWindow):

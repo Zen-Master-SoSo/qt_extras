@@ -1,6 +1,8 @@
 # qt_extras
 
-Provides various extras for PyQt, including menu_button, list_layouts, autofit, SigBlock, ShutUpQT, WidgetDisabler and DevilBox
+Provides various extras for PyQt, including menu_button, list_button,
+list_layouts, autofit, SigBlock, ShutUpQT, WidgetDisabler and DevilBox
+
 
 ## Classes:
 
@@ -26,7 +28,11 @@ Quick and dirty error message dialog.
 
 ### menu_button:
 
-Pushbutton with an integrated drop-down menu.
+Pushbutton with an integrated pop-aside menu.
+
+### menu_button:
+
+Pushbutton with an integrated drop-down list containing text and data.
 
 ### list_layouts:
 
@@ -34,7 +40,7 @@ Pushbutton with an integrated drop-down menu.
 
 ### autofit
 
-Abbreviates widget text to fit inside the widget.
+Abbreviates widget text to fit inside a widget.
 
 ### info:
 

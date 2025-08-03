@@ -93,6 +93,7 @@ class Thing(QWidget):
 	def __str__(self):
 		return self.label.text()
 
+
 if __name__ == "__main__":
 	from PyQt5.QtGui import QKeySequence
 	from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QShortcut, QVBoxLayout
@@ -105,4 +106,4 @@ if __name__ == "__main__":
 	window.show()
 	app.exec()
 
-#  end qt_extras/tests/menu_button.py
+#  end qt_extras/tests/grid_layout.py
