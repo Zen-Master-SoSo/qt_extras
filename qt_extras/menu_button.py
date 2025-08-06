@@ -29,6 +29,7 @@ delegated to the integrated menu. These include:
 	insertAction
 	insertActions
 	removeAction
+	addSeparator
 	clear
 
 
@@ -75,6 +76,7 @@ class QtMenuButton(QPushButton):
 		self.insertAction = self.menu.insertAction
 		self.insertActions = self.menu.insertActions
 		self.removeAction = self.menu.removeAction
+		self.addSeparator = self.menu.addSeparator
 		self.clear = self.menu.clear
 
 		self.clicked.connect(self.click_event)
