@@ -124,12 +124,13 @@ class _ListLayout:
 
 class _ListBoxLayout(_ListLayout):
 
-	def __init__(self, end_space = None):
+	def __init__(self, parent = None, /, end_space = None):
 		"""
 		"end_space" is optional spacing with the given stretch factor
 		to append to the end of the list.
 		"""
-		super().__init__()
+		super().__init__(parent)
+		self.setSizeConstraint(QLayout.SetMinimumSize)
 		self.items = []
 		self.end_space = end_space
 		if self.end_space is not None:
