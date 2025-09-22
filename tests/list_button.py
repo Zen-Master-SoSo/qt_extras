@@ -1,6 +1,6 @@
 #  qt_extras/tests/menu_button.py
 #
-#  Copyright 2024 liyang <liyang@veronica>
+#  Copyright 2024 Leon Dionne <ldionne@dridesign.sh.cn>
 #
 from PyQt5.QtCore import pyqtSignal, pyqtSlot, QVariant
 from PyQt5.QtWidgets import QMainWindow, QPushButton

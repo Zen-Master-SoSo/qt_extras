@@ -1,6 +1,6 @@
 #  qt_extras/tests/autofit.py
 #
-#  Copyright 2024 liyang <liyang@veronica>
+#  Copyright 2024 Leon Dionne <ldionne@dridesign.sh.cn>
 #
 import qt_extras.autofit
 from PyQt5.QtCore import QPoint
