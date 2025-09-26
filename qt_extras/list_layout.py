@@ -130,7 +130,6 @@ class _ListBoxLayout(_ListLayout):
 		to append to the end of the list.
 		"""
 		super().__init__()
-		self.setSizeConstraint(QLayout.SetMinimumSize)
 		self.items = []
 		self.end_space = end_space
 		if self.end_space is not None:
