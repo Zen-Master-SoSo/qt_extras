@@ -18,15 +18,14 @@
 #  MA 02110-1301, USA.
 #
 """
-Override's widget's setText() function.
-Stores original text as "_qtxtra_text", abbreviates it,
-and sets it. anytime afterwards when the widget is resized, it
-updates the abbreviated text.
+Functions used for fitting text in a widget into a tight space.
 
-Apply this effect using:
+First vowels and punctuation are removed, then other letters. Letters are
+removed from the center to the ends, in keeping with the observation that:
 
-	QWidget.autoFit(<padding>)
-
+  "aoccdrnig to a rscheearch at Cmabrigde Uinervtisy, it deosn’t mttaer in waht
+  oredr the ltteers in a wrod are, the olny iprmoatnt tihng is taht the frist and
+  lsat ltteer be in the rghit pclae."
 """
 from functools import partial
 from PyQt5.QtGui import QFontMetrics
@@ -85,19 +84,21 @@ def __resize(widget, event):
 	widget._qtxtra_resize_event(event)
 	widget._qtxtra_set_text(abbreviated_text(widget, widget._qtxtra_text))
 
-def __autofit(widget):
-	if not hasattr(widget, 'setText'):
-		raise AttributeError('Cannot autoFit; widget has no "setText"')
+def autofit(widget):
+	"""
+	Apply "autofit" effect to a QWidget (QPushButton, QCheckBox, QRadioButton, QLabel).
+
+	After applying the effect, when the widget's text is changed using
+	"setText", or when the widget is resized, the text will be abrreviated to fit
+	inside the available space, (if necessary).
+	"""
+	if not isinstance(widget, (QPushButton, QCheckBox, QRadioButton, QLabel)):
+		raise AttributeError('Cannot apply autofit effect to this widget')
 	widget._qtxtra_text = ""
 	widget._qtxtra_set_text = widget.setText
 	widget._qtxtra_resize_event = widget.resizeEvent
 	widget.setText = partial(__set_text, widget)
 	widget.resizeEvent = partial(__resize, widget)
-
-QPushButton.autoFit = __autofit
-QCheckBox.autoFit = __autofit
-QRadioButton.autoFit = __autofit
-QLabel.autoFit = __autofit
 
 
 #  end qt_extras/qt_extras/autofit.py

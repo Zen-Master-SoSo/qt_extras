@@ -40,7 +40,7 @@ Pushbutton with an integrated drop-down list containing text and data.
 
 ### autofit
 
-Abbreviates widget text to fit inside a widget.
+Functions to abbreviate widget text to fit inside a widget's available space.
 
 ### info:
 
