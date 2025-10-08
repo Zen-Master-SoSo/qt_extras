@@ -23,7 +23,7 @@ Provides various extras for PyQt.
 import logging
 from PyQt5.QtWidgets import QMessageBox
 
-__version__ = "1.4.0"
+__version__ = "1.5.0"
 
 class SigBlock:
 	"""
