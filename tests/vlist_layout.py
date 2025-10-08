@@ -112,17 +112,11 @@ class MainWindow(QMainWindow):
 
 	@pyqtSlot(QWidget)
 	def slot_move_widget_up(self, thing):
-		try:
-			self.list.move_up(thing)
-		except Exception as e:
-			logging.error(e)
+		self.list.move_up(thing)
 
 	@pyqtSlot(QWidget)
 	def slot_move_widget_down(self, thing):
-		try:
-			self.list.move_down(thing)
-		except Exception as e:
-			logging.error(e)
+		self.list.move_down(thing)
 
 	@pyqtSlot()
 	def slot_clear_list(self):
@@ -141,7 +135,7 @@ class Thing(QWidget):
 		super().__init__(parent)
 		self.setMinimumWidth(self.minimum_width)
 		self.setLayout(QHBoxLayout())
-		self.label = QLabel('Thing %d' % Thing.ord, self)
+		self.label = QLabel(f'Thing {Thing.ord}', self)
 		self.layout().addWidget(self.label)
 		self.up_button = QPushButton('Move up', self)
 		self.up_button.clicked.connect(self.slot_trigger_up)
@@ -162,6 +156,7 @@ class Thing(QWidget):
 	def __str__(self):
 		return self.label.text()
 
+
 if __name__ == "__main__":
 	logging.basicConfig(
 		level = logging.DEBUG,
@@ -171,5 +166,6 @@ if __name__ == "__main__":
 	window = MainWindow()
 	window.show()
 	app.exec()
+
 
 #  end qt_extras/tests/vlist_layout.py

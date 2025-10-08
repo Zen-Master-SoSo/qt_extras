@@ -2,10 +2,26 @@
 #
 #  Copyright 2025 Leon Dionne <ldionne@dridesign.sh.cn>
 #
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+#  MA 02110-1301, USA.
+#
 import logging
-from PyQt5.QtCore import pyqtSignal, pyqtSlot
-from PyQt5.QtWidgets import QMainWindow, QWidget, QPushButton, QSpinBox, QLabel
-from PyQt5.QtWidgets import QHBoxLayout, QVBoxLayout, QFrame
+from PyQt5.QtGui import QKeySequence
+from PyQt5.QtCore import pyqtSlot
+from PyQt5.QtWidgets import QApplication, QWidget, QMainWindow, QPushButton, QSpinBox, QLabel, \
+							QShortcut, QVBoxLayout, QFrame
 from qt_extras.list_layout import GListLayout, HORIZONTAL_FLOW
 
 
@@ -86,7 +102,7 @@ class Thing(QWidget):
 		super().__init__(parent)
 		self.setMinimumWidth(self.minimum_width)
 		self.setLayout(QVBoxLayout())
-		self.label = QLabel('Thing %d' % Thing.ord, self)
+		self.label = QLabel(f'Thing {Thing.ord}', self)
 		self.layout().addWidget(self.label)
 		Thing.ord += 1
 
@@ -95,8 +111,6 @@ class Thing(QWidget):
 
 
 if __name__ == "__main__":
-	from PyQt5.QtGui import QKeySequence
-	from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QShortcut, QVBoxLayout
 	logging.basicConfig(
 		level = logging.DEBUG,
 		format = "[%(filename)24s:%(lineno)-4d] %(message)s"
@@ -105,5 +119,6 @@ if __name__ == "__main__":
 	window = MainWindow()
 	window.show()
 	app.exec()
+
 
 #  end qt_extras/tests/grid_layout.py
