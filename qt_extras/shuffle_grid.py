@@ -93,12 +93,17 @@ class ShuffleGrid(QGridLayout):
 		"""
 		if row < 0 or row >= self.rowCount():
 			raise RuntimeError(f'Cannot delete row {row}')
+		if self.row_is_empty(row):
+			raise ValueError(f'Deletion of empty row {row} has no effect')
 		for col in range(self.columnCount()):
 			item = self.itemAtPosition(row, col)
-			index = self.indexOf(item)
-			self.takeAt(index)
-			item.widget().setParent(None)
-			item.widget().deleteLater()
+			if not item is None:
+				index = self.indexOf(item)
+				self.takeAt(index)
+				widget = item.widget()
+				if not widget is None:
+					widget.setParent(None)
+					widget.deleteLater()
 		self.invalidate()
 
 	def insert_row(self, widgets, row):
