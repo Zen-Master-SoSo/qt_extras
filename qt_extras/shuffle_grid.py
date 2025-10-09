@@ -26,10 +26,71 @@ from PyQt5.QtWidgets import QGridLayout
 
 class ShuffleGrid(QGridLayout):
 	"""
-	Extends QGridLayout to allow for moving rows up / down and deleting.
+	Extends QGridLayout to allow for moving rows up / down, inserting, and deleting.
 	"""
 
+	def __iter__(self):
+		"""
+		Generator which returns a list of widgets occupying each row on iteration.
+
+		Where there is no widget in a particular column, the list yielded will contain
+		None at that index. The rows returned on each iteration will be the same as the
+		number of INHABITED rows (rows that are completely empty are skipped).
+		"""
+		for row in self.inhabited_row_indexes():
+			yield self.row(row)
+
+	def row(self, row):
+		"""
+		Returns a list of widgets occupying the given row.
+
+		Where there is no widget in a particular column, the list yielded will contain
+		None at that index.
+		"""
+		return [ None if self.itemAtPosition(row, col) is None \
+			else self.itemAtPosition(row, col).widget() \
+			for col in range(self.columnCount()) ]
+
+	def column(self, column):
+		"""
+		Returns a list of widgets occupying the given column.
+
+		Where there is no widget in a particular row, the list yielded will contain
+		None at that index. In any case, the number of elements returned in the list
+		will be the same as the number of INHABITED rows (rows that are completely
+		empty are skipped).
+		"""
+		return [ None if self.itemAtPosition(row, column) is None \
+			else self.itemAtPosition(row, column).widget() \
+			for row in self.inhabited_row_indexes() ]
+
+	def row_is_empty(self, row):
+		"""
+		Returns True if given row has no items (used for skipping empty rows).
+		"""
+		return all(self.itemAtPosition(row, col) is None \
+			for col in range(self.columnCount()))
+
+	def inhabited_row_count(self):
+		"""
+		Returns the count of rows which are inhabited with at least one item.
+		"""
+		return self.rowCount() - sum(self.row_is_empty(row) for row in range(self.rowCount()))
+
+	def inhabited_row_indexes(self):
+		"""
+		Returns a list of row indexes for rows which are inhabited with at least one item.
+		"""
+		return [row for row in range(self.rowCount()) if not self.row_is_empty(row)]
+
 	def delete_row(self, row):
+		"""
+		Delete the items on the given row.
+
+		The row number given is numbered according to QGridLayout conventions, which
+		may include uninhabited rows left over from a row deletion operation - NOT
+		according to ShuffleGrid.inhabited_row_indexes().
+		"""
 		if row < 0 or row >= self.rowCount():
 			raise RuntimeError(f'Cannot delete row {row}')
 		for col in range(self.columnCount()):
@@ -39,26 +100,85 @@ class ShuffleGrid(QGridLayout):
 			item.widget().setParent(None)
 			item.widget().deleteLater()
 
+	def insert_row(self, widgets, row):
+		"""
+		Insert the given list of widgets at the given row
+
+		The row number given is numbered according to QGridLayout conventions, which
+		may include uninhabited rows left over from a row deletion operation - NOT
+		according to ShuffleGrid.inhabited_row_indexes().
+		"""
+		if self.rowCount() < 2:
+			raise RuntimeError(f'Cannot insert row - grid only has one row')
+		if row < 0 or row >= self.rowCount():
+			raise RuntimeError(f'Cannot insert row at {row}')
+		if not self.row_is_empty(row):
+			for iter_row in range(self.rowCount() - 1, row - 1, -1):
+				if self.row_is_empty(iter_row):
+					continue
+				for col in range(self.columnCount()):
+					item = self.itemAtPosition(iter_row, col)
+					index = self.indexOf(item)
+					self.takeAt(index)
+					self.addItem(item, iter_row + 1, col)
+		for col, widget in enumerate(widgets):
+			self.addWidget(widget, row, col)
+		self.invalidate()
+
 	def move_row_up(self, row):
-		if row < 1:
-			raise RuntimeError(f'Cannot move row {row} up')
-		self.swap_row(row, row - 1)
+		"""
+		Swap the items in the given row with the items in the previous inhabited row.
+
+		Raises IndexError if the given row is the first inhabited row.
+
+		Raises ValueError if the given row is empty.
+
+		The row number given is numbered according to QGridLayout conventions, which
+		may include uninhabited rows left over from a row deletion operation - NOT
+		according to ShuffleGrid.inhabited_row_indexes().
+		"""
+		valid_indexes = self.inhabited_row_indexes()
+		try:
+			index = valid_indexes.index(row)
+		except ValueError:
+			raise ValueError(f'Cannot move empty row {row}')
+		if index == 0:
+			raise IndexError(f'Cannot move first row {row} up')
+		self.swap_rows(row, valid_indexes[index - 1])
 
 	def move_row_down(self, row):
-		if row >= self.rowCount():
-			raise RuntimeError(f'Cannot move row {row} up')
-		self.swap_row(row, row + 1)
+		"""
+		Swap the items in the given row with the items in the next row.
 
-	def swap_row(self, from_row, to_row):
+		Raises IndexError if given row is the last inhabited row.
+
+		Raises ValueError if the given row is empty.
+
+		The row number given is numbered according to QGridLayout conventions, which
+		may include uninhabited rows left over from a row deletion operation - NOT
+		according to ShuffleGrid.inhabited_row_indexes().
+		"""
+		valid_indexes = self.inhabited_row_indexes()
+		try:
+			index = valid_indexes.index(row)
+		except ValueError:
+			raise ValueError(f'Cannot move empty row {row}')
+		if index + 1 == len(valid_indexes):
+			raise IndexError(f'Cannot move last row {row} down')
+		self.swap_rows(row, valid_indexes[index + 1])
+
+	def swap_rows(self, a, b):
+		"""
+		Swap the items in row "a" with the items in row "b".
+		"""
 		for col in range(self.columnCount()):
-			from_item = self.itemAtPosition(from_row, col)
-			from_widget = from_item.widget()
-			to_item = self.itemAtPosition(to_row, col)
-			to_widget = to_item.widget()
-			to_index = self.indexOf(to_item)
-			self.takeAt(to_index)
-			item = self.replaceWidget(from_widget, to_widget, Qt.FindDirectChildrenOnly)
-			self.addItem(from_item, to_row, col)
+			item_a = self.itemAtPosition(a, col)
+			widget_a = item_a.widget()
+			item_b = self.itemAtPosition(b, col)
+			widget_b = item_b.widget()
+			self.takeAt(self.indexOf(item_b))
+			item = self.replaceWidget(widget_a, widget_b, Qt.FindDirectChildrenOnly)
+			self.addItem(item_a, b, col)
 
 
 #  end qt_extras/shuffle_grid.py

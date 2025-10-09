@@ -35,28 +35,81 @@ class MainWindow(QMainWindow):
 		shortcut = QShortcut(QKeySequence('Esc'), self)
 		shortcut.activated.connect(self.close)
 
-		frm = QFrame(self)
-		self.grid = ShuffleGrid(frm)
+		self.button_actions = [
+			(self.slot_delete, 'del'),
+			(self.slot_insert, 'ins'),
+			(self.slot_move_up, 'up'),
+			(self.slot_move_down, 'down')
+		]
+		self.frame = QFrame(self)
+		self.grid = ShuffleGrid(self.frame)
 		for row in range(5):
-			for col in range(5):
-				btn = QPushButton(f'Row {row} Col {col}', frm)
-				btn.clicked.connect(partial(self.slot_btn_click, btn))
-				self.grid.addWidget(btn, row, col)
-		self.setCentralWidget(frm)
+			for col, widget in enumerate(self.construct_row(row)):
+				self.grid.addWidget(widget, row, col)
+		self.setCentralWidget(self.frame)
+
+	def construct_row(self, row):
+		widgets = []
+		for col, tup in enumerate(self.button_actions):
+			button = QPushButton(f'Row {row} Col {col}: {tup[1]}', self.frame)
+			button.clicked.connect(partial(tup[0], button))
+			widgets.append(button)
+		return widgets
+
+	def get_button_row(self, button):
+		idx = self.grid.indexOf(button)
+		row, *_ = self.grid.getItemPosition(idx)
+		return row
 
 	@pyqtSlot(QPushButton)
-	def slot_btn_click(self, btn):
-		idx = self.grid.indexOf(btn)
-		row, col, *_ = self.grid.getItemPosition(idx)
-		print(f'idx {idx}: row {row} col {col}')
-		if col == 3:
-			if row > 0:
-				self.grid.move_row_up(row)
-		elif col == 4:
-			if row < 4:
-				self.grid.move_row_down(row)
-		else:
-			self.grid.delete_row(row)
+	def slot_delete(self, button):
+		row = self.get_button_row(button)
+		print(f'Delete row {row}')
+		self.grid.delete_row(row)
+		print(f'  rowCount is now {self.grid.rowCount()}, ' +
+			f'with {self.grid.inhabited_row_count()} rows inhabited')
+		self.print_contents()
+
+	@pyqtSlot(QPushButton)
+	def slot_insert(self, button):
+		row = self.get_button_row(button)
+		if row <= self.grid.rowCount():
+			print(f'Insert at row {row}')
+			self.grid.insert_row(self.construct_row(row), row)
+			print(f'  rowCount is now {self.grid.rowCount()}, ' +
+				f'with {self.grid.inhabited_row_count()} rows inhabited')
+		self.print_contents()
+
+	@pyqtSlot(QPushButton)
+	def slot_move_up(self, button):
+		row = self.get_button_row(button)
+		if row > 0:
+			print(f'Move row {row} up')
+			self.grid.move_row_up(row)
+		self.print_contents()
+
+	@pyqtSlot(QPushButton)
+	def slot_move_down(self, button):
+		row = self.get_button_row(button)
+		if row < self.grid.rowCount() - 1:
+			print(f'Move row {row} down')
+			self.grid.move_row_down(row)
+		self.print_contents()
+
+	def show_empty_rows(self):
+		for row in range(self.grid.rowCount()):
+			s = 'EMPTY' if self.grid.row_is_empty(row) else 'not empty'
+			print(f'  row {row} {s}')
+
+	def print_contents(self):
+		print('Iteration:')
+		for row in self.grid:
+			print([ widget.text() for widget in row ])
+		print('Column 0:')
+		print([ widget.text() for widget in self.grid.column(0) ])
+		row = self.grid.inhabited_row_indexes()[0]
+		print(f'First inhabited row (row {row}):')
+		print([ widget.text() for widget in self.grid.row(row) ])
 
 
 if __name__ == "__main__":
