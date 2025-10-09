@@ -99,6 +99,7 @@ class ShuffleGrid(QGridLayout):
 			self.takeAt(index)
 			item.widget().setParent(None)
 			item.widget().deleteLater()
+		self.invalidate()
 
 	def insert_row(self, widgets, row):
 		"""
@@ -118,9 +119,10 @@ class ShuffleGrid(QGridLayout):
 					continue
 				for col in range(self.columnCount()):
 					item = self.itemAtPosition(iter_row, col)
-					index = self.indexOf(item)
-					self.takeAt(index)
-					self.addItem(item, iter_row + 1, col)
+					if not item is None:
+						index = self.indexOf(item)
+						self.takeAt(index)
+						self.addItem(item, iter_row + 1, col)
 		for col, widget in enumerate(widgets):
 			self.addWidget(widget, row, col)
 		self.invalidate()
@@ -179,6 +181,7 @@ class ShuffleGrid(QGridLayout):
 			self.takeAt(self.indexOf(item_b))
 			item = self.replaceWidget(widget_a, widget_b, Qt.FindDirectChildrenOnly)
 			self.addItem(item_a, b, col)
+		self.invalidate()
 
 
 #  end qt_extras/shuffle_grid.py
