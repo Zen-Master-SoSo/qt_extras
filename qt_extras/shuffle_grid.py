@@ -18,7 +18,8 @@
 #  MA 02110-1301, USA.
 #
 """
-Provides the ShuffleGrid class - extends QGridLayout to allow for moving rows up / down and deleting.
+Provides the ShuffleGrid class -
+extends QGridLayout to allow for moving rows up / down and deleting.
 """
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QGridLayout
@@ -115,7 +116,7 @@ class ShuffleGrid(QGridLayout):
 		according to ShuffleGrid.inhabited_row_indexes().
 		"""
 		if self.rowCount() < 2:
-			raise RuntimeError(f'Cannot insert row - grid only has one row')
+			raise RuntimeError('Cannot insert row - grid only has one row')
 		if row < 0 or row >= self.rowCount():
 			raise RuntimeError(f'Cannot insert row at {row}')
 		if not self.row_is_empty(row):
@@ -147,8 +148,8 @@ class ShuffleGrid(QGridLayout):
 		valid_indexes = self.inhabited_row_indexes()
 		try:
 			index = valid_indexes.index(row)
-		except ValueError:
-			raise ValueError(f'Cannot move empty row {row}')
+		except ValueError as e:
+			raise ValueError(f'Cannot move empty row {row}') from e
 		if index == 0:
 			raise IndexError(f'Cannot move first row {row} up')
 		self.swap_rows(row, valid_indexes[index - 1])
@@ -168,8 +169,8 @@ class ShuffleGrid(QGridLayout):
 		valid_indexes = self.inhabited_row_indexes()
 		try:
 			index = valid_indexes.index(row)
-		except ValueError:
-			raise ValueError(f'Cannot move empty row {row}')
+		except ValueError as e:
+			raise ValueError(f'Cannot move empty row {row}') from e
 		if index + 1 == len(valid_indexes):
 			raise IndexError(f'Cannot move last row {row} down')
 		self.swap_rows(row, valid_indexes[index + 1])
@@ -184,7 +185,7 @@ class ShuffleGrid(QGridLayout):
 			item_b = self.itemAtPosition(b, col)
 			widget_b = item_b.widget()
 			self.takeAt(self.indexOf(item_b))
-			item = self.replaceWidget(widget_a, widget_b, Qt.FindDirectChildrenOnly)
+			self.replaceWidget(widget_a, widget_b, Qt.FindDirectChildrenOnly)
 			self.addItem(item_a, b, col)
 		self.invalidate()
 

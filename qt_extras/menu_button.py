@@ -49,11 +49,14 @@ Typical use (in a dialog created by QtDesigner):
 	self.b_menu.addAction(action)
 
 """
-from PyQt5.QtCore import pyqtSignal, pyqtSlot, QPoint, QVariant
+from PyQt5.QtCore import pyqtSlot, QPoint
 from PyQt5.QtWidgets import QMenu, QPushButton
 
 
 class QtMenuButton(QPushButton):
+	"""
+	Pushbutton with an integrated drop-down menu.
+	"""
 
 	def __init__(self, parent, fill_callback = None, constrain_width = False):
 		"""

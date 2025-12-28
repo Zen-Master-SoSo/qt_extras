@@ -21,7 +21,7 @@
 Provides various extras for PyQt.
 """
 import logging
-from PyQt5.QtWidgets import QMessageBox
+from PyQt5.QtWidgets import QWidget, QMessageBox
 
 __version__ = "1.6.2"
 
@@ -48,7 +48,7 @@ class SigBlock:
 			control.blockSignals(False)
 
 
-class ShutUpQT(object):
+class ShutUpQT:
 	"""
 	A context manager for temporarily supressing DEBUG level messages.
 	Primarily used when loading a Qt graphical user interface using uic.
@@ -56,6 +56,8 @@ class ShutUpQT(object):
 
 	def __init__(self, level=logging.ERROR):
 		self.level = level
+		self.root = None
+		self.previous_log_level = None
 
 	def __enter__(self):
 		self.root = logging.getLogger()
@@ -100,16 +102,11 @@ class DevilBox(QMessageBox):
 		self.setIcon(QMessageBox.Critical)
 		if isinstance(message, Exception):
 			tb = message.__traceback__
-			self.setText('%s: %s in %s %s, line %d' % (
-				type(message).__name__,
-				str(message),
-				tb.tb_frame.f_code.co_filename,
-				tb.tb_frame.f_code.co_name,
-				tb.tb_lineno
-			))
+			self.setText(f'{message.__class__.__name__}: {message} in ' +\
+				f'{tb.tb_frame.f_code.co_filename} {tb.tb_frame.f_code.co_name}, line {tb.tb_lineno}')
 		else:
 			self.setText(str(message))
-		self.exec_();
+		self.exec_()
 
 
 #  end qt_extras/qt_extras/__init__.py

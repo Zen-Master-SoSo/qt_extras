@@ -18,13 +18,16 @@
 #  MA 02110-1301, USA.
 #
 """
-Pushbutton with an integrated drop-down list, signalling when an item is selected.
+Pushbutton with an integrated drop-down list.
 """
 from PyQt5.QtCore import pyqtSignal, pyqtSlot, QPoint, QVariant
 from PyQt5.QtWidgets import QMenu, QPushButton
 
 
 class QtListButton(QPushButton):
+	"""
+	Pushbutton with an integrated drop-down list.
+	"""
 
 	sig_item_selected = pyqtSignal(str, QVariant)
 
@@ -100,6 +103,7 @@ class QtListButton(QPushButton):
 		for action in self.menu.actions():
 			if action.data() is data:
 				return action.text()
+		return None
 
 	def select_text(self, text):
 		self._do_fill()

@@ -77,12 +77,12 @@ def abbreviated_text(widget, text, *, fixed_width = None):
 	return text
 
 def __set_text(widget, text):
-	widget._qtxtra_text = text
-	widget._qtxtra_set_text(abbreviated_text(widget, widget._qtxtra_text))
+	widget.qtxtra_autofit_text = text
+	widget.qtxtra_autofit_set_text(abbreviated_text(widget, widget.qtxtra_autofit_text))
 
 def __resize(widget, event):
-	widget._qtxtra_resize_event(event)
-	widget._qtxtra_set_text(abbreviated_text(widget, widget._qtxtra_text))
+	widget.qtxtra_autofit_resize_event(event)
+	widget.qtxtra_autofit_set_text(abbreviated_text(widget, widget.qtxtra_autofit_text))
 
 def autofit(widget):
 	"""
@@ -94,9 +94,9 @@ def autofit(widget):
 	"""
 	if not isinstance(widget, (QPushButton, QCheckBox, QRadioButton, QLabel)):
 		raise AttributeError('Cannot apply autofit effect to this widget')
-	widget._qtxtra_text = ""
-	widget._qtxtra_set_text = widget.setText
-	widget._qtxtra_resize_event = widget.resizeEvent
+	widget.qtxtra_autofit_text = ""
+	widget.qtxtra_autofit_set_text = widget.setText
+	widget.qtxtra_autofit_resize_event = widget.resizeEvent
 	widget.setText = partial(__set_text, widget)
 	widget.resizeEvent = partial(__resize, widget)
 

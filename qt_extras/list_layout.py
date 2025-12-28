@@ -21,7 +21,7 @@
 "Collection" layouts which act like lists.
 """
 from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtWidgets import QLayout, QBoxLayout, QHBoxLayout, QVBoxLayout, QGridLayout, QWidget
+from PyQt5.QtWidgets import QHBoxLayout, QVBoxLayout, QGridLayout
 
 HORIZONTAL_FLOW = 0
 VERTICAL_FLOW = 1
@@ -33,6 +33,10 @@ class _ListLayout:
 	"""
 
 	sig_len_changed = pyqtSignal()
+
+	def __init__(self):
+		super().__init__()
+		self.items = []
 
 	def __iter__(self):
 		return self.items.__iter__()
@@ -51,24 +55,6 @@ class _ListLayout:
 
 	def __getitem__(self, idx):
 		return self.items[idx]
-
-	def append(self, item):
-		if self.end_space is None:
-			self.addWidget(item)
-		else:
-			self.insertWidget(len(self.items), item)
-		self.items.append(item)
-		self.sig_len_changed.emit()
-
-	def insert(self, index, item):
-		if not (0 <= index <= len(self.items)):
-			raise IndexError()
-		if index == len(self.items):
-			self.append(item)
-		else:
-			self.items.insert(index, item)
-			self.insertWidget(index, item)
-		self.sig_len_changed.emit()
 
 	def remove(self, item):
 		if item not in self.items:
@@ -112,7 +98,6 @@ class _ListLayout:
 		for iter_index in reversed(range(len(self.items))):
 			item = self.takeAt(iter_index)
 			item.widget().deleteLater()
-		self.items = []
 		self.sig_len_changed.emit()
 
 	def count(self):
@@ -123,6 +108,9 @@ class _ListLayout:
 
 
 class _ListBoxLayout(_ListLayout):
+	"""
+	Abstract class which handles box (not grid) layouts.
+	"""
 
 	def __init__(self, /, end_space = None):
 		"""
@@ -130,21 +118,40 @@ class _ListBoxLayout(_ListLayout):
 		to append to the end of the list.
 		"""
 		super().__init__()
-		self.items = []
 		self.end_space = end_space
 		if self.end_space is not None:
 			self.addStretch(self.end_space)
 
+	def append(self, item):
+		if self.end_space is None:
+			self.addWidget(item)
+		else:
+			self.insertWidget(len(self.items), item)
+		self.items.append(item)
+		self.sig_len_changed.emit()
+
+	def insert(self, index, item):
+		if not 0 <= index <= len(self.items):
+			raise IndexError()
+		if index == len(self.items):
+			self.append(item)
+		else:
+			self.items.insert(index, item)
+			self.insertWidget(index, item)
+		self.sig_len_changed.emit()
+
 
 
 class HListLayout(QHBoxLayout, _ListBoxLayout):
-
-	pass
+	"""
+	A horizontal layout which behaves just like a python list.
+	"""
 
 
 class VListLayout(QVBoxLayout, _ListBoxLayout):
-
-	pass
+	"""
+	A vertical layout which behaves just like a python list.
+	"""
 
 
 
@@ -162,7 +169,6 @@ class GListLayout(_ListLayout, QGridLayout):
 		If the flow is vertical, items are added top to bottom, then left to right.
 		"""
 		super().__init__()
-		self.items = []
 		self.columns_or_rows = columns_or_rows
 		self.flow = flow
 
@@ -173,7 +179,7 @@ class GListLayout(_ListLayout, QGridLayout):
 		return tup
 
 	def insert(self, index, item):
-		if not (0 <= index <= len(self.items)):
+		if not 0 <= index <= len(self.items):
 			raise IndexError()
 		if index == len(self.items):
 			tup = self.append(item)
