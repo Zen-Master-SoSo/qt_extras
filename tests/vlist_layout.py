@@ -80,6 +80,7 @@ class MainWindow(QMainWindow):
 		self.list.sig_len_changed.connect(self.slot_len_changed)
 		frm.setLayout(self.list)
 		main_layout.addWidget(frm)
+		self.move(40, 40)
 
 	def make_thing(self):
 		thing = Thing(self)

@@ -95,9 +95,10 @@ class _ListLayout:
 		self.swap(item, self.items[index + 1])
 
 	def clear(self):
-		for iter_index in reversed(range(len(self.items))):
-			item = self.takeAt(iter_index)
-			item.widget().deleteLater()
+		while item := self.takeAt(0):
+			if widget := item.widget():
+				widget.deleteLater()
+		self.items = []
 		self.sig_len_changed.emit()
 
 	def count(self):
@@ -140,6 +141,10 @@ class _ListBoxLayout(_ListLayout):
 			self.insertWidget(index, item)
 		self.sig_len_changed.emit()
 
+	def clear(self):
+		super().clear()
+		if self.end_space is not None:
+			self.addStretch(self.end_space)
 
 
 class HListLayout(QHBoxLayout, _ListBoxLayout):
