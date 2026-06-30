@@ -18,10 +18,9 @@
 #  MA 02110-1301, USA.
 #
 """
-Provides a command-line tool which accepts a PyQT class name and provides:
-1. A list of all class members
--- or --
-2. An import statement
+Provides a command-line tool which accepts a PyQT class name and provides a
+list of all class members or an import statement. By default, shows all public
+members of the given class.
 """
 import sys, argparse, importlib
 
@@ -38,10 +37,7 @@ def print_members_of(class_name):
 def main():
 
 	parser = argparse.ArgumentParser()
-	parser.epilog = """
-	Routines to show info from Qt classes.
-	By default, shows all public members of the given class.
-	"""
+	parser.epilog = __doc__
 	parser.add_argument('ClassName', type=str, nargs='+', help='Class to inspect')
 	parser.add_argument('--import-statement', '-i', action='store_true', help="Show import statement")
 	options = parser.parse_args()
