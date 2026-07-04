@@ -21,9 +21,13 @@
 Provides various extras for PyQt.
 """
 import logging
-from PyQt5.QtWidgets import QWidget, QMessageBox
+from traceback import print_tb
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QApplication, QErrorMessage, QWidget, QMessageBox
+from log_soso import StreamToLogger
 
 __version__ = "1.6.5"
+
 
 class SigBlock:
 	"""
@@ -107,6 +111,18 @@ class DevilBox(QMessageBox):
 		else:
 			self.setText(str(message))
 		self.exec_()
+
+
+def exceptions_hook(exception_type, value, traceback):
+	if not QApplication.instance() is None:
+		msg = QErrorMessage.qtHandler()
+		msg.setWindowModality(Qt.ApplicationModal)
+		msg.showMessage(
+			f'{exception_type.__name__}: "{value}"',
+			exception_type.__name__)
+	logging.error('Exception "%s": %s', exception_type.__name__, value)
+	with StreamToLogger() as log:
+		print_tb(traceback, file = log)
 
 
 #  end qt_extras/qt_extras/__init__.py

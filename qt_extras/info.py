@@ -24,6 +24,9 @@ members of the given class.
 """
 import sys, argparse, importlib
 
+# TODO: Show help for members matching given string (i.e. "qtinfo qspinbox value")
+# TODO: Eliminate static qtmodule list, use some sort of discovery
+
 def print_members_of(class_name):
 	for qtmodule in ['PyQt5', 'PyQt5.QtCore', 'PyQt5.QtGui', 'PyQt5.QtWidgets']:
 		module = importlib.import_module(qtmodule)
