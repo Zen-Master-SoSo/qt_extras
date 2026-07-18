@@ -76,11 +76,14 @@ class MainWindow(QMainWindow):
 		main_layout.addItem(lo)
 
 		frm = QFrame(self)
+		frm.setFrameShape(QFrame.Panel)
 		self.list = VListLayout()
 		self.list.sig_len_changed.connect(self.slot_len_changed)
 		frm.setLayout(self.list)
 		main_layout.addWidget(frm)
-		self.move(40, 40)
+		main_layout.addStretch()
+
+		self.move(100, 140)
 
 	def make_thing(self):
 		thing = Thing(self)
