@@ -26,7 +26,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QApplication, QErrorMessage, QWidget, QMessageBox
 from log_soso import StreamToLogger
 
-__version__ = "1.7.0"
+__version__ = "1.7.1"
 
 
 class SigBlock:
