@@ -108,7 +108,9 @@ class MainWindow(QMainWindow):
 	@pyqtSlot()
 	def slot_remove_widget(self):
 		if self.spinbox.value() > -1:
-			self.list.remove(self.list[self.spinbox.value()])
+			widget = self.list[self.spinbox.value()]
+			self.list.remove(widget)
+			widget.deleteLater()
 
 	@pyqtSlot()
 	def slot_swap_extents(self):
@@ -116,11 +118,11 @@ class MainWindow(QMainWindow):
 
 	@pyqtSlot(QWidget)
 	def slot_move_widget_up(self, thing):
-		self.list.move_up(thing)
+		self.list.move_previous(thing)
 
 	@pyqtSlot(QWidget)
 	def slot_move_widget_down(self, thing):
-		self.list.move_down(thing)
+		self.list.move_next(thing)
 
 	@pyqtSlot()
 	def slot_clear_list(self):

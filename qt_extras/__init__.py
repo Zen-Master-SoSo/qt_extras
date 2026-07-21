@@ -20,7 +20,7 @@
 """
 Provides various extras for PyQt.
 """
-import logging
+import logging, sys
 from traceback import print_tb
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QApplication, QErrorMessage, QWidget, QMessageBox
@@ -120,9 +120,8 @@ def exceptions_hook(exception_type, value, traceback):
 		msg.showMessage(
 			f'{exception_type.__name__}: "{value}"',
 			exception_type.__name__)
-	logging.error('Exception "%s": %s', exception_type.__name__, value)
-	with StreamToLogger() as log:
-		print_tb(traceback, file = log)
+	sys.stderr.write(f'{exception_type.__name__}: "{value}"\n')
+	print_tb(traceback, file = sys.stderr)
 
 
 #  end qt_extras/qt_extras/__init__.py

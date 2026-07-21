@@ -1,6 +1,6 @@
-#  qt_extras/tests/grid_layout.py
+#  qt_extras/tests/column_layout.py
 #
-#  Copyright 2025 Leon Dionne <ldionne@dridesign.sh.cn>
+#  Copyright 2026 Leon Dionne <ldionne@dridesign.sh.cn>
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -18,25 +18,29 @@
 #  MA 02110-1301, USA.
 #
 import logging
+from random import randint
 from PyQt5.QtGui import QKeySequence
 from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtWidgets import QApplication, QWidget, QMainWindow, QPushButton, QSpinBox, QLabel, \
-							QShortcut, QVBoxLayout, QFrame
-from qt_extras.list_layout import GListLayout, HORIZONTAL_FLOW
+							QShortcut, QVBoxLayout, QLayout, QFrame
+from qt_extras.list_layout import ColumnListLayout, HORIZONTAL_FLOW
 
 
 class MainWindow(QMainWindow):
 
 	def __init__(self):
 		super().__init__()
-		self.quit_shortcut = QShortcut(QKeySequence('Ctrl+Q'), self)
-		self.quit_shortcut.activated.connect(self.close)
+		shortcut = QShortcut(QKeySequence('Ctrl+Q'), self)
+		shortcut.activated.connect(self.close)
+		shortcut = QShortcut(QKeySequence('ESC'), self)
+		shortcut.activated.connect(self.close)
+		self.resize(450, 200)
 
-		wid = QWidget(self)
-		self.setCentralWidget(wid)
+		frame = QFrame(self)
+		self.setCentralWidget(frame)
 		lo = QVBoxLayout()
 		lo.setSpacing(6)
-		wid.setLayout(lo)
+		frame.setLayout(lo)
 
 		button = QPushButton('Add widget', self)
 		button.clicked.connect(self.slot_add_widget)
@@ -62,13 +66,16 @@ class MainWindow(QMainWindow):
 		lo.addWidget(button)
 
 		frm = QFrame(self)
-		self.list = GListLayout(1, HORIZONTAL_FLOW)
+		self.list = ColumnListLayout(HORIZONTAL_FLOW, end_space = True)
+		self.list.setSpacing(0)
 		frm.setLayout(self.list)
 		lo.addWidget(frm)
 
+		lo.addStretch()
+
 
 	def resizeEvent(self, event):
-		self.list.set_columns(max(1, event.size().width() // Thing.minimum_width))
+		self.list.reflow(width = self.width())
 
 	@pyqtSlot()
 	def slot_add_widget(self):
@@ -96,14 +103,14 @@ class MainWindow(QMainWindow):
 
 class Thing(QWidget):
 
-	minimum_width = 78
 	ord = 1
 
 	def __init__(self, parent):
 		super().__init__(parent)
-		self.setMinimumWidth(self.minimum_width)
-		self.setLayout(QVBoxLayout())
-		self.label = QLabel(f'Thing {Thing.ord}', self)
+		lo = QVBoxLayout()
+		lo.setContentsMargins(2,2,2,2)
+		self.setLayout(lo)
+		self.label = QLabel(f'Thing {Thing.ord} ' + ('X' * randint(1, 14)), self)
 		self.layout().addWidget(self.label)
 		Thing.ord += 1
 
@@ -122,4 +129,4 @@ if __name__ == "__main__":
 	app.exec()
 
 
-#  end qt_extras/tests/grid_layout.py
+#  end qt_extras/tests/column_layout.py

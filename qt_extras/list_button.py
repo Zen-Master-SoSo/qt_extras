@@ -31,7 +31,7 @@ class QtListButton(QPushButton):
 
 	sig_item_selected = pyqtSignal(str, QVariant)
 
-	def __init__(self, parent, fill_callback = None, constrain_width = False):
+	def __init__(self, parent, *, fill_callback = None, constrain_width = False):
 		"""
 		fill_callback should return a list of tuples, containing text and data. It will
 		be called when the menu button is clicked.
@@ -132,5 +132,6 @@ class QtListButton(QPushButton):
 			self.menu.clear()
 			for tup in self.fill_callback():
 				self.addItem(*tup)
+
 
 #  end qt_extras/list_button.py

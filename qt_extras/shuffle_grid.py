@@ -18,8 +18,8 @@
 #  MA 02110-1301, USA.
 #
 """
-Provides the ShuffleGrid class -
-extends QGridLayout to allow for moving rows up / down and deleting.
+Provides the ShuffleGrid class, which extends QGridLayout to allow for moving
+rows up / down and deleting.
 """
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QGridLayout

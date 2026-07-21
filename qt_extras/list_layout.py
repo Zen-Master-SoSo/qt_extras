@@ -20,8 +20,10 @@
 """
 "Collection" layouts which act like lists.
 """
+import logging
+from math import ceil
 from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtWidgets import QHBoxLayout, QVBoxLayout, QGridLayout
+from PyQt5.QtWidgets import QHBoxLayout, QVBoxLayout, QGridLayout, QSpacerItem, QSizePolicy
 
 HORIZONTAL_FLOW = 0
 VERTICAL_FLOW = 1
@@ -56,13 +58,14 @@ class _ListLayout:
 	def __getitem__(self, idx):
 		return self.items[idx]
 
+	def append(self, item):
+		raise NotImplemented()
+
+	def insert(self, index, item):
+		raise NotImplemented()
+
 	def remove(self, item):
-		if item not in self.items:
-			raise ValueError("Item not in list layout")
-		index = self.items.index(item)
-		del self.items[index]
-		item.deleteLater()
-		self.sig_len_changed.emit()
+		raise NotImplemented()
 
 	def swap(self, item_a, item_b):
 		if not item_a in self.items or not item_b in self.items:
@@ -78,23 +81,10 @@ class _ListLayout:
 		self.items[index_a] = item_b
 		self.items[index_b] = item_a
 
-	def move_up(self, item):
-		if item not in self.items:
-			raise ValueError("Item not in list layout")
-		index = self.items.index(item)
-		if index == 0:
-			raise ValueError("Item is first in layout")
-		self.swap(item, self.items[index - 1])
-
-	def move_down(self, item):
-		if item not in self.items:
-			raise ValueError("Item not in list layout")
-		index = self.items.index(item)
-		if index == len(self.items) - 1:
-			raise ValueError("Item is last in layout")
-		self.swap(item, self.items[index + 1])
-
 	def clear(self):
+		"""
+		Clears (and deletes) all the widgets in this layout.
+		"""
 		while item := self.takeAt(0):
 			if widget := item.widget():
 				widget.deleteLater()
@@ -108,7 +98,41 @@ class _ListLayout:
 		return self.items.index(item)
 
 
-class _ListBoxLayout(_ListLayout):
+class _ListLinearLayout(_ListLayout):
+	"""
+	Abstract class which handles box (not grid) layouts.
+	"""
+
+	def remove(self, item):
+		"""
+		Removes the item from the layout, and calls "item.deleteLater()" to actually
+		delete the widget.
+		"""
+		if item not in self.items:
+			raise ValueError("Item not in list layout")
+		index = self.items.index(item)
+		del self.items[index]
+		item.deleteLater()
+		self.sig_len_changed.emit()
+
+	def move_previous(self, item):
+		if item not in self.items:
+			raise ValueError("Item not in list layout")
+		index = self.items.index(item)
+		if index == 0:
+			raise ValueError("Item is first in layout")
+		self.swap(item, self.items[index - 1])
+
+	def move_next(self, item):
+		if item not in self.items:
+			raise ValueError("Item not in list layout")
+		index = self.items.index(item)
+		if index == len(self.items) - 1:
+			raise ValueError("Item is last in layout")
+		self.swap(item, self.items[index + 1])
+
+
+class _ListBoxLayout(_ListLinearLayout):
 	"""
 	Abstract class which handles box (not grid) layouts.
 	"""
@@ -159,12 +183,23 @@ class VListLayout(QVBoxLayout, _ListBoxLayout):
 	"""
 
 
-
 class GListLayout(_ListLayout, QGridLayout):
 	"""
-	Extends QGridLayout.
-	By default, adds items left-to-right, top-to-bottom.
-	Change this using one of the direction constants.
+	Extends QGridLayout to create a layout with a fixed number of columns
+	or rows, which increases the number of columns or rows in the non-fixed axis
+	when needed.
+
+	By default, adds items left-to-right, top-to-bottom. Change this using
+	one of the direction constants.
+
+	Create a GListLayout with two columns:
+
+		lo = GListLayout(2, flow = VERTICAL_FLOW)
+
+	Create a GListLayout with four rows:
+
+		lo = GListLayout(4, flow = HORIZONTAL_FLOW)
+
 	"""
 
 	def __init__(self, columns_or_rows, flow = HORIZONTAL_FLOW):
@@ -202,7 +237,6 @@ class GListLayout(_ListLayout, QGridLayout):
 		index = self.items.index(item)
 		self._take_all_from(index)
 		del self.items[index]
-		item.deleteLater()
 		self._add_all_from(index)
 		self.sig_len_changed.emit()
 
@@ -248,6 +282,136 @@ class GListLayout(_ListLayout, QGridLayout):
 		"""
 		for iter_index in reversed(range(index, len(self.items))):
 			self.takeAt(iter_index)
+
+
+class ColumnListLayout(QGridLayout, _ListLinearLayout):
+	"""
+	Extends QGridLayout to allow for arranging items in columns which wrap
+	automatically according to the item's sizeHint.
+
+	You must call "reflow()" on your instance of this class if the container which
+	uses this layout resizes, or else contained widgets may be squeezed.
+	"""
+
+	def __init__(self, flow = HORIZONTAL_FLOW, end_space = False):
+		"""
+		"flow" determines whether to add items left-to-right, or top-to-bottom. If you
+		want to add items left-to-right, use HORIZONTAL_FLOW, If you want to add items
+		top-to-bottom, use VERTICAL_FLOW,
+		"""
+		super().__init__()
+		self.flow = flow
+		self.end_space = end_space
+		self.height = None
+		self.width = None
+
+	def reflow(self, *, height = None, width = None):
+		"""
+		Calculates number of columns or rows needed and reorders accordingly.
+		"""
+		if height:
+			self.height = height
+		if width:
+			self.width = width
+		if len(self.items) == 0:
+			return
+		if self.flow == HORIZONTAL_FLOW:
+			if self.width is None:
+				raise RuntimeError('Cannot reflow with unknown width')
+			widget_widths = [ item.sizeHint().width() for item in self.items ]
+			flow_scenario = best_flow_scenario(widget_widths, self.width, self.spacing())
+			while item := self.takeAt(0):
+				pass
+			for row, items in enumerate(flow_scenario.partition(self.items)):
+				for col, item in enumerate(items):
+					self.addWidget(item, row, col)
+			if self.end_space:
+				self.addItem(QSpacerItem(0, 0, QSizePolicy.MinimumExpanding, QSizePolicy.Preferred),
+					0, self.columnCount(), self.rowCount() - 1, 1)
+		else:
+			if self.height is None:
+				raise RuntimeError('Cannot reflow with unknown height')
+			widget_heights = [ item.sizeHint().height() for item in self.items ]
+			flow_scenario = best_flow_scenario(widget_heights, self.height, self.spacing())
+			while item := self.takeAt(0):
+				pass
+			for col, items in enumerate(flow_scenario.partition(self.items)):
+				for row, item in enumerate(items):
+					self.addWidget(item, row, col)
+			if self.end_space:
+				self.addItem(QSpacerItem(0, 0, QSizePolicy.Preferred, QSizePolicy.MinimumExpanding),
+					self.rowCount(), 0, 1, self.columnCount() - 1)
+
+	def append(self, item):
+		self.items.append(item)
+		self.reflow()
+		self.sig_len_changed.emit()
+
+	def insert(self, index, item):
+		if not 0 <= index <= len(self.items):
+			raise IndexError()
+		if index == len(self.items):
+			self.append(item)
+		else:
+			self.items.insert(index, item)
+		self.reflow()
+		self.sig_len_changed.emit()
+
+	def remove(self, item):
+		super().remove(item)
+		self.reflow()
+
+	def swap(self, item_a, item_b):
+		if not item_a in self.items or not item_b in self.items:
+			raise ValueError("Item not in list layout")
+		index_a = self.items.index(item_a)
+		index_b = self.items.index(item_b)
+		self.items[index_a] = item_b
+		self.items[index_b] = item_a
+		self.reflow()
+
+
+class FlowScenario:
+
+	def __init__(self, widget_sizes, spacing, x_axis_count):
+		self.spacing = spacing
+		self.x_axis_len = x_axis_count
+		self.y_axis_len = ceil(len(widget_sizes) / self.x_axis_len)
+		self.y_axis_list = self.partition(widget_sizes)
+		self.x_axis_sizes = [
+			max(
+				self.y_axis_list[i][x_axis] if x_axis < len(self.y_axis_list[i]) else 0
+				for i in range(self.y_axis_len)
+			)
+			for x_axis in range(self.x_axis_len)
+		]
+
+	def space_needed(self):
+		return sum(self.x_axis_sizes) + self.spacing * (len(self.x_axis_sizes) - 1)
+
+	def partition(self, items):
+		return [
+			items[i * self.x_axis_len : i * self.x_axis_len + self.x_axis_len]
+			for i in range(self.y_axis_len)
+		]
+
+
+def best_flow_scenario(widget_sizes, container_size, spacing):
+	x_axis_count = 1
+	cumulative_size = 0
+	for widget_size in widget_sizes:
+		cumulative_size += widget_size
+		if cumulative_size >= container_size:
+			break
+		cumulative_size += spacing
+		x_axis_count += 1
+	flow_scenario = None
+	while x_axis_count > 1:
+		flow_scenario = FlowScenario(widget_sizes, spacing, x_axis_count)
+		if flow_scenario.space_needed() <= container_size:
+			break
+		x_axis_count -= 1
+	return flow_scenario or FlowScenario(widget_sizes, spacing, 1)
 
 
 #  end qt_extras/qt_extras/list_layout.py

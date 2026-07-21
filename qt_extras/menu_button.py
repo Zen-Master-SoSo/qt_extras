@@ -58,7 +58,7 @@ class QtMenuButton(QPushButton):
 	Pushbutton with an integrated drop-down menu.
 	"""
 
-	def __init__(self, parent, fill_callback = None, constrain_width = False):
+	def __init__(self, parent, *, fill_callback = None, constrain_width = False):
 		"""
 		fill_callback is called when the menu button is clicked, to allow you to fill
 		the menu before it is shown.
