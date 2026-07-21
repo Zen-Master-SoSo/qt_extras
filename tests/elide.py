@@ -1,6 +1,6 @@
-#  qt_extras/tests/autofit.py
+#  qt_extras/tests/elide.py
 #
-#  Copyright 2024 Leon Dionne <ldionne@dridesign.sh.cn>
+#  Copyright 2026 Leon Dionne <ldionne@dridesign.sh.cn>
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@ from PyQt5.QtWidgets import QWidget, QMainWindow, QApplication, QShortcut, \
 							QPushButton, QCheckBox, QRadioButton, QLabel, \
 							QLineEdit, QVBoxLayout, QSizePolicy
 from PyQt5.QtGui import QKeySequence
-from qt_extras.autofit import autofit
+from qt_extras.autofit import elide
 
 
 class MainWindow(QMainWindow):
@@ -36,14 +36,14 @@ class MainWindow(QMainWindow):
 
 		layout.addWidget(QLabel('QPushbutton:', self))
 		w = QPushButton(self)
-		autofit(w)
+		elide(w)
 		w.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Fixed)
 		ed.textChanged.connect(w.setText)
 		layout.addWidget(w)
 
 		layout.addWidget(QLabel('QPushbutton with padding:', self))
 		w = QPushButton(self)
-		autofit(w)
+		elide(w)
 		w.setStyleSheet('QPushButton { padding: 16px; }')
 		w.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Fixed)
 		ed.textChanged.connect(w.setText)
@@ -51,14 +51,14 @@ class MainWindow(QMainWindow):
 
 		layout.addWidget(QLabel('QLabel:', self))
 		w = QLabel(self)
-		autofit(w)
+		elide(w)
 		w.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Fixed)
 		ed.textChanged.connect(w.setText)
 		layout.addWidget(w)
 
 		layout.addWidget(QLabel('QLabel with padding:', self))
 		w = QLabel(self)
-		autofit(w)
+		elide(w)
 		w.setStyleSheet('QLabel { padding: 16px; }')
 		w.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Fixed)
 		ed.textChanged.connect(w.setText)
@@ -66,14 +66,14 @@ class MainWindow(QMainWindow):
 
 		layout.addWidget(QLabel('QCheckBox:', self))
 		w = QCheckBox(self)
-		autofit(w)
+		elide(w)
 		w.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Fixed)
 		ed.textChanged.connect(w.setText)
 		layout.addWidget(w)
 
 		layout.addWidget(QLabel('QCheckBox with padding:', self))
 		w = QCheckBox(self)
-		autofit(w)
+		elide(w)
 		w.setStyleSheet('QCheckBox { padding: 16px; }')
 		w.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Fixed)
 		ed.textChanged.connect(w.setText)
@@ -81,14 +81,14 @@ class MainWindow(QMainWindow):
 
 		layout.addWidget(QLabel('QRadioButton:', self))
 		w = QRadioButton(self)
-		autofit(w)
+		elide(w)
 		w.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Fixed)
 		ed.textChanged.connect(w.setText)
 		layout.addWidget(w)
 
 		layout.addWidget(QLabel('QRadioButton with padding:', self))
 		w = QRadioButton(self)
-		autofit(w)
+		elide(w)
 		w.setStyleSheet('QRadioButton { padding: 16px; }')
 		w.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Fixed)
 		ed.textChanged.connect(w.setText)
@@ -120,4 +120,4 @@ if __name__ == "__main__":
 	app.exec()
 
 
-#  end qt_extras/tests/autofit.py
+#  end qt_extras/tests/elide.py

@@ -32,32 +32,39 @@ from PyQt5.QtGui import QFontMetrics
 from PyQt5.QtWidgets import QStyle, QStyleOptionButton, \
 							QPushButton, QCheckBox, QRadioButton, QLabel
 
+
 __KEEPERS = list("bcdfghjklmnpqrstvwxyzBCDFGHJKLMNPQRSTVWXYZ0123456789")
 STYLE_OPTION = QStyleOptionButton()
+ELIDE_CHARS = '...'
+
+
+def available_width(widget):
+	if isinstance(widget, QLabel):
+		return widget.width() - 2
+	if isinstance(widget, QPushButton):
+		subelem = QStyle.SE_PushButtonContents
+	elif isinstance(widget, QCheckBox):
+		subelem = QStyle.SE_CheckBoxContents
+	elif isinstance(widget, QRadioButton):
+		subelem = QStyle.SE_RadioButtonContents
+	return widget.width() + widget.style().subElementRect(subelem, STYLE_OPTION, widget).width()
+
+
+# ----------------------
+# AutoFit
 
 def abbreviated_text(widget, text, *, fixed_width = None):
 	"""
-	Standard routine for shortening text to fit buttons, labels, etc.
+	Shortens text to fit buttons, labels, etc. by eliminating first spaces, then
+	vowels, then consonants and numbers, starting from the beginning and ending and
+	moving towards the center of the text.
 	"""
 	if len(text) == 1:
 		return text
-	if fixed_width:
-		available_width = fixed_width
-	elif isinstance(widget, QLabel):
-		available_width = widget.width()
-	else:
-		if isinstance(widget, QPushButton):
-			subelem = QStyle.SE_PushButtonContents
-		elif isinstance(widget, QCheckBox):
-			subelem = QStyle.SE_CheckBoxContents
-		elif isinstance(widget, QRadioButton):
-			subelem = QStyle.SE_RadioButtonContents
-		available_width = widget.width() + widget.style().subElementRect(
-			subelem, STYLE_OPTION, widget).width()
-
+	available = fixed_width or available_width(widget)
 	metrics = QFontMetrics(widget.font())
 	remove_front = True
-	while len(text) > 1 and metrics.boundingRect(text).width() > available_width:
+	while len(text) > 1 and metrics.boundingRect(text).width() > available:
 		mid = len(text) // 2
 		pop = None
 		if remove_front:
@@ -76,29 +83,88 @@ def abbreviated_text(widget, text, *, fixed_width = None):
 		remove_front = not remove_front
 	return text
 
-def __set_text(widget, text):
+def __set_abbreviated_text(widget, text):
 	widget.qtxtra_autofit_text = text
 	widget.qtxtra_autofit_set_text(abbreviated_text(widget, widget.qtxtra_autofit_text))
 
-def __resize(widget, event):
+def __resize_abbreviated(widget, event):
 	widget.qtxtra_autofit_resize_event(event)
 	widget.qtxtra_autofit_set_text(abbreviated_text(widget, widget.qtxtra_autofit_text))
 
 def autofit(widget):
 	"""
-	Apply "autofit" effect to a QWidget (QPushButton, QCheckBox, QRadioButton, QLabel).
+	Applies the "autofit" effect on a QPushButton, QCheckBox, QRadioButton, or QLabel.
+
+	Usage:
+
+		label = QLabel(text, self)
+		autofit(label)
 
 	After applying the effect, when the widget's text is changed using
-	"setText", or when the widget is resized, the text will be abrreviated to fit
-	inside the available space, (if necessary).
+	"setText", or when the widget is resized, the text will be abrreviated if
+	necessary to fit inside the available space.
+
+	You should apply this effect in you form's constructor. Applying the effect
+	after the form is shown can cause an endless recursion!
 	"""
 	if not isinstance(widget, (QPushButton, QCheckBox, QRadioButton, QLabel)):
 		raise AttributeError('Cannot apply autofit effect to this widget')
 	widget.qtxtra_autofit_text = ""
 	widget.qtxtra_autofit_set_text = widget.setText
 	widget.qtxtra_autofit_resize_event = widget.resizeEvent
-	widget.setText = partial(__set_text, widget)
-	widget.resizeEvent = partial(__resize, widget)
+	widget.setText = partial(__set_abbreviated_text, widget)
+	widget.resizeEvent = partial(__resize_abbreviated, widget)
+
+
+# ----------------------
+# AutoElide
+
+def elided_text(widget, text, *, fixed_width = None):
+	"""
+	Shortens the text to fit buttons, labels, etc. by adding an elide mark "..."
+	"""
+	if len(text) == 1:
+		return text
+	available = fixed_width or available_width(widget)
+	metrics = QFontMetrics(widget.font())
+	elide_width = metrics.boundingRect(ELIDE_CHARS).width()
+	elide = ''
+	while len(text) > 1 and (metrics.boundingRect(text).width() + elide_width) > available:
+		text = text[:-1]
+		elide = ELIDE_CHARS
+	return text + elide
+
+def __set_elided_text(widget, text):
+	widget.qtxtra_elide_text = text
+	widget.qtxtra_elide_set_text(elided_text(widget, widget.qtxtra_elide_text))
+
+def __resize_elided(widget, event):
+	widget.qtxtra_elide_resize_event(event)
+	widget.qtxtra_elide_set_text(elided_text(widget, widget.qtxtra_elide_text))
+
+def elide(widget):
+	"""
+	Applies the "elide" effect on a QPushButton, QCheckBox, QRadioButton, or QLabel.
+
+	Usage:
+
+		label = QLabel(text, self)
+		elide(label)
+
+	After applying the effect, when the widget's text is changed using
+	"setText", or when the widget is resized, the text will be abrreviated if
+	necessary to fit inside the available space.
+
+	You should apply this effect in you form's constructor. Applying the effect
+	after the form is shown can cause an endless recursion!
+	"""
+	if not isinstance(widget, (QPushButton, QCheckBox, QRadioButton, QLabel)):
+		raise AttributeError('Cannot apply elide effect to this widget')
+	widget.qtxtra_elide_text = ""
+	widget.qtxtra_elide_set_text = widget.setText
+	widget.qtxtra_elide_resize_event = widget.resizeEvent
+	widget.setText = partial(__set_elided_text, widget)
+	widget.resizeEvent = partial(__resize_elided, widget)
 
 
 #  end qt_extras/qt_extras/autofit.py

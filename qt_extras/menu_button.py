@@ -36,8 +36,8 @@ delegated to the integrated menu. These include:
 Typical use (in a dialog created by QtDesigner):
 
 	menu_button = QtMenuButton(self)
-	self.layout().replaceWidget(self.b_menu, menu_button)
-	self.b_menu.deleteLater()
+	self.layout().replaceWidget(self.menu_button_placeholder, menu_button)
+	self.menu_button_placeholder.deleteLater()
 	self.b_menu = menu_button
 
 	action = QAction('Do the first thing', self.b_menu)
