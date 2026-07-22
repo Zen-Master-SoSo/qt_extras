@@ -45,7 +45,7 @@ def available_width(widget):
 		subelem = QStyle.SE_PushButtonContents
 	elif isinstance(widget, QCheckBox):
 		subelem = QStyle.SE_CheckBoxContents
-	elif isinstance(widget, QRadioButton):
+	else:
 		subelem = QStyle.SE_RadioButtonContents
 	return widget.width() + widget.style().subElementRect(subelem, STYLE_OPTION, widget).width()
 
@@ -128,11 +128,11 @@ def elided_text(widget, text, *, fixed_width = None):
 	available = fixed_width or available_width(widget)
 	metrics = QFontMetrics(widget.font())
 	elide_width = metrics.boundingRect(ELIDE_CHARS).width()
-	elide = ''
+	elide_chars = ''
 	while len(text) > 1 and (metrics.boundingRect(text).width() + elide_width) > available:
 		text = text[:-1]
-		elide = ELIDE_CHARS
-	return text + elide
+		elide_chars = ELIDE_CHARS
+	return text + elide_chars
 
 def __set_elided_text(widget, text):
 	widget.qtxtra_elide_text = text

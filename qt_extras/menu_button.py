@@ -74,12 +74,12 @@ class QtMenuButton(QPushButton):
 		self.menu.setObjectName('qt_menu_button_menu')
 
 		self.actions = self.menu.actions
-		self.addAction = self.menu.addAction
-		self.addActions = self.menu.addActions
-		self.insertAction = self.menu.insertAction
-		self.insertActions = self.menu.insertActions
-		self.removeAction = self.menu.removeAction
-		self.addSeparator = self.menu.addSeparator
+		self.addAction = self.menu.addAction			# pylint: disable = invalid-name
+		self.addActions = self.menu.addActions			# pylint: disable = invalid-name
+		self.insertAction = self.menu.insertAction		# pylint: disable = invalid-name
+		self.insertActions = self.menu.insertActions	# pylint: disable = invalid-name
+		self.removeAction = self.menu.removeAction		# pylint: disable = invalid-name
+		self.addSeparator = self.menu.addSeparator		# pylint: disable = invalid-name
 		self.clear = self.menu.clear
 
 		self.clicked.connect(self.click_event)
@@ -95,10 +95,12 @@ class QtMenuButton(QPushButton):
 			self.menu.setMinimumWidth(self.width())
 		self.menu.exec(point)
 
+	# pylint: disable-next = invalid-name
 	def setFont(self, font):
 		super().setFont(font)
 		self.menu.setFont(self.font())
 
+	# pylint: disable-next = invalid-name
 	def setPointSize(self, size):
 		font = self.font()
 		font.setPointSize(size)

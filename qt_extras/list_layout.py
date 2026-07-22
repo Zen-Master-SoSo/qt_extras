@@ -20,7 +20,6 @@
 """
 "Collection" layouts which act like lists.
 """
-import logging
 from math import ceil
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QHBoxLayout, QVBoxLayout, QGridLayout, QSpacerItem, QSizePolicy
@@ -58,26 +57,17 @@ class _ListLayout:
 	def __getitem__(self, idx):
 		return self.items[idx]
 
-	def append(self, item):
-		raise NotImplemented()
-
-	def insert(self, index, item):
-		raise NotImplemented()
-
-	def remove(self, item):
-		raise NotImplemented()
-
 	def swap(self, item_a, item_b):
 		if not item_a in self.items or not item_b in self.items:
 			raise ValueError("Item not in list layout")
 		index_a = self.items.index(item_a)
 		index_b = self.items.index(item_b)
 		if index_a < index_b:
-			self.replaceWidget(item_a, item_b)
-			self.insertWidget(index_b, item_a)
+			self.replaceWidget(item_a, item_b)			# pylint: disable = no-member
+			self.insertWidget(index_b, item_a)			# pylint: disable = no-member
 		else:
-			self.replaceWidget(item_b, item_a)
-			self.insertWidget(index_a, item_b)
+			self.replaceWidget(item_b, item_a)			# pylint: disable = no-member
+			self.insertWidget(index_a, item_b)			# pylint: disable = no-member
 		self.items[index_a] = item_b
 		self.items[index_b] = item_a
 
@@ -85,7 +75,7 @@ class _ListLayout:
 		"""
 		Clears (and deletes) all the widgets in this layout.
 		"""
-		while item := self.takeAt(0):
+		while item := self.takeAt(0):					# pylint: disable = no-member
 			if widget := item.widget():
 				widget.deleteLater()
 		self.items = []
@@ -145,13 +135,13 @@ class _ListBoxLayout(_ListLinearLayout):
 		super().__init__()
 		self.end_space = end_space
 		if self.end_space is not None:
-			self.addStretch(self.end_space)
+			self.addStretch(self.end_space)				# pylint: disable = no-member
 
 	def append(self, item):
 		if self.end_space is None:
-			self.addWidget(item)
+			self.addWidget(item)						# pylint: disable = no-member
 		else:
-			self.insertWidget(len(self.items), item)
+			self.insertWidget(len(self.items), item)	# pylint: disable = no-member
 		self.items.append(item)
 		self.sig_len_changed.emit()
 
@@ -162,13 +152,13 @@ class _ListBoxLayout(_ListLinearLayout):
 			self.append(item)
 		else:
 			self.items.insert(index, item)
-			self.insertWidget(index, item)
+			self.insertWidget(index, item)				# pylint: disable = no-member
 		self.sig_len_changed.emit()
 
 	def clear(self):
 		super().clear()
 		if self.end_space is not None:
-			self.addStretch(self.end_space)
+			self.addStretch(self.end_space)				# pylint: disable = no-member
 
 
 class HListLayout(QHBoxLayout, _ListBoxLayout):
@@ -372,6 +362,10 @@ class ColumnListLayout(QGridLayout, _ListLinearLayout):
 
 
 class FlowScenario:
+	"""
+	Trial scenario which calculates overall width given partitioned sizes in the
+	x-axis.
+	"""
 
 	def __init__(self, widget_sizes, spacing, x_axis_count):
 		self.spacing = spacing

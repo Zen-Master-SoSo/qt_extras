@@ -51,10 +51,12 @@ class QtListButton(QPushButton):
 	def clear(self):
 		self.menu.clear()
 
+	# pylint: disable-next = invalid-name
 	def addItem(self, item_text, item_data):
 		action = self.menu.addAction(item_text)
 		action.setData(item_data)
 
+	# pylint: disable-next = invalid-name
 	def addItems(self, items):
 		"""
 		items must be a list of tuples containing (text, data)
@@ -73,10 +75,12 @@ class QtListButton(QPushButton):
 	def __len__(self):
 		return len(self.menu.actions())
 
+	# pylint: disable-next = invalid-name
 	def setFont(self, font):
 		super().setFont(font)
 		self.menu.setFont(self.font())
 
+	# pylint: disable-next = invalid-name
 	def setPointSize(self, size):
 		font = self.font()
 		font.setPointSize(size)
