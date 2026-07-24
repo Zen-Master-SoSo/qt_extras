@@ -32,9 +32,68 @@ import PyQt5
 
 QT_MODULES = list(f'PyQt5.{module.name}' for module in iter_modules([dirname(PyQt5.__file__)]))
 
-class QtCls:
+
+def print_columnar(items):
+	term_size = get_terminal_size()
+	columns = StringColumns(items, term_size.columns, 2)
+	columns.print()
+
+
+class AbstractEntity:
 	"""
-	Wrapper containing information on a Qt module and class.
+	Abstract base class of QtModule and QtClass
+	"""
+
+	def members(self, search_term):
+		members = [ member for member in dir(self.actual_entity) if member[0] != '_' ]
+		if search_term:
+			search_term = search_term.lower()
+			return [ member for member in members if search_term in member.lower() ]
+		return members
+
+	def print_members(self, search_term):
+		members = self.members(search_term)
+		if members:
+			print(f'{self.name} "{search_term}":'
+				if search_term
+				else self.name)
+			print('-' * 20)
+			print_columnar(members)
+		else:
+			print('Nothing found')
+
+	def print_help(self, search_term):
+		if search_term:
+			for member in self.members(search_term):
+				help(getattr(self.actual_entity, member))
+		else:
+			help(self.actual_entity)
+
+
+class QtModule(AbstractEntity):
+	"""
+	Wrapper providing information about a Qt module.
+	"""
+
+	@classmethod
+	def get_module(cls, module_name):
+		module_name = module_name.lower()
+		for qtmodule in QT_MODULES:
+			if module_name == qtmodule.lower():
+				return QtModule(importlib.import_module(qtmodule))
+		return None
+
+	def __init__(self, module):
+		self.actual_entity = module
+		self.name = module.__name__
+
+	def print_import_statement(self):
+		print(f'import {self.name}')
+
+
+class QtCls(AbstractEntity):
+	"""
+	Wrapper providing information about a Qt class.
 	"""
 
 	@classmethod
@@ -49,63 +108,44 @@ class QtCls:
 
 	def __init__(self, module, class_name):
 		self.module = module
-		self.class_name = class_name
-		self.qtclass = getattr(module, class_name)
-
-	def members(self, search_term):
-		members = [ member for member in dir(self.qtclass) if member[0] != '_' ]
-		if search_term:
-			search_term = search_term.lower()
-			return [ member for member in members if search_term in member.lower() ]
-		return members
-
-	def print_members(self, search_term):
-		members = self.members(search_term)
-		if members:
-			print(f'{self.class_name} "{search_term}":'
-				if search_term
-				else self.class_name)
-			print('-' * 20)
-			term_size = get_terminal_size()
-			columns = StringColumns(members, term_size.columns, 2)
-			columns.print()
-		else:
-			print('Nothing found')
+		self.name = class_name
+		self.actual_entity = getattr(module, class_name)
 
 	def print_import_statement(self):
-		print(f'from {self.module.__name__} import {self.class_name}')
-
-	def print_help(self, search_term):
-		if search_term:
-			for member in self.members(search_term):
-				help(getattr(self.qtclass, member))
-		else:
-			help(self.qtclass)
+		print(f'from {self.module.__name__} import {self.name}')
 
 
 def main():
 	parser = argparse.ArgumentParser()
-	parser.epilog = __doc__
-	parser.add_argument('ClassName', type = str, help = 'Class to inspect')
+	parser.add_argument('EntityName', type = str, nargs = '?',
+		help = 'Class or module to inspect')
 	parser.add_argument('SearchTerm', type = str, nargs = '?',
-		help = 'Search term to filter class members shown.')
+		help = 'Search term to filter which members of the given Entity to show.')
 	group = parser.add_mutually_exclusive_group()
 	group.add_argument('--help-text', '-H', action = 'store_true',
-		help = "Show help for the given class or method")
+		help = "Show pydoc help for the given module, class, or method")
 	group.add_argument('--import-statement', '-i', action='store_true',
-		help="Show import statement")
+		help="Print the import statement for the given module or class.")
+	parser.epilog = __doc__
 	options = parser.parse_args()
 
-	cls = QtCls.get_class(options.ClassName)
-	if cls is None:
-		sys.stderr.write(f'Class not found: "{options.ClassName}"\n')
-		return 1
-	if options.import_statement:
-		cls.print_import_statement()
-	elif options.help_text:
-		cls.print_help(options.SearchTerm)
+	if options.EntityName:
+		entity = QtModule.get_module(options.EntityName) \
+			or QtModule.get_module('PyQt5.' + options.EntityName) \
+			or QtCls.get_class(options.EntityName)
+		if entity is None:
+			sys.stderr.write(f'Module or class not found: "{options.EntityName}"\n')
+			return 1
+		if options.import_statement:
+			entity.print_import_statement()
+		elif options.help_text:
+			entity.print_help(options.SearchTerm)
+		else:
+			entity.print_members(options.SearchTerm)
 	else:
-		cls.print_members(options.SearchTerm)
+		print('PyQt modules available:')
+		print('-' * 20)
+		print_columnar(QT_MODULES)
 	return 0
 
 
